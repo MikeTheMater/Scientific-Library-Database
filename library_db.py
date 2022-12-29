@@ -27,7 +27,9 @@ def searchforAuthor(name):
         # executing our sql query
         cursor.execute("SELECT a.FirstName, a.LastName  FROM Author as a  WHERE a.LastName= :name or a.FirstName= :name ", {'name':name[0]})
         result=cursor.fetchall()
+        print("Authors\n First Name  Last Name")
         for i in range(len(result)):
+            
             print("{} ".format(i+1),result[i][0], " ",result[i][1])
     elif len(name)==2:
         # Creating cursor object using connection object
@@ -36,13 +38,15 @@ def searchforAuthor(name):
         # executing our sql query
         cursor.execute("SELECT a.FirstName, a.LastName  FROM Author as a  WHERE (a.LastName= :name2 and a.FirstName= :name1) or (a.LastName= :name1 and a.FirstName= :name2) ", {'name1':name[0],'name2':name[1]})
         result=cursor.fetchall()
+        print("Authors\n First Name  Last Name")
         for i in range(len(result)):
-            print("{} ".format(i+1),result[i][0], " ",result[i][1],"\n")
+            print("{} ".format(i+1),result[i][0], " ",result[i][1])
 
 def searchforTitle(title):
     cursor = conn.cursor()
     cursor.execute("SELECT p.Title  FROM Publication as p  WHERE p.Title like :title ", (f'%{title}%',))
     result=cursor.fetchall()
+    print("Titles")
     for i in range(len(result)):
         print("{} ".format(i+1),result[i][0])
     
@@ -59,10 +63,12 @@ def searchforKeyword(keyword):
     WHERE c_k1.Keywords like ?
     ORDER by a_k1.Keywords, c_k1.Keywords """, (f'%{keyword}%',f'%{keyword}%',))
     result=cursor.fetchall()
+    print("Keyword  Title")
     for i in range(len(result)):
-        print("{} ".format(i+1),result[i][0])
+        
+        print("{} ".format(i+1),result[i][0], " ",result[i][1])
 
-conn=sqlite3.connect('Scientific_Library.db')
+conn=sqlite3.connect('Scientific_Libary.db')
 
 print("Connected to SQLite")
  
