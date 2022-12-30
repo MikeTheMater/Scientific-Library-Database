@@ -36,13 +36,33 @@ def publicationInfo(title):
     match choice:
         case 1:
             showAuthors(title)
+            
         case 2:
             showReferences(title)
+            back=input("Do you want to return to Publication's information?(Yes/No)(Default Yes)\n")
+            if(back=="No"):
+                ex=input("Do you want to search for something else?(Yes/No)\n")
+                if (ex=="Yes"): makechoice()
+                else: quit()
+            else:publicationInfo(title)
         case 3:
             showCitations(title)
+            back=input("Do you want to return to Publication's information?(Yes/No)(Default Yes)\n")
+            if(back=="No"):
+                ex=input("Do you want to search for something else?(Yes/No)\n")
+                if (ex=="Yes"): makechoice()
+                else: quit()
+            else:publicationInfo(title)
         case 4:
             showAbstract(title)
+            back=input("Do you want to return to Publication's information?(Yes/No)(Default Yes)\n")
+            if(back=="No"):
+                ex=input("Do you want to search for something else?(Yes/No)\n")
+                if (ex=="Yes"): makechoice()
+                else: quit()
+            else:publicationInfo(title)
         case -1:makechoice()
+    
 
 def showAbstract(title):
     cursor = conn.cursor()
@@ -222,10 +242,9 @@ def searchforKeyword(keyword):
         print("{} ".format(i+1),result[i][0], " ",result[i][1])
 
 def makechoice():
-    print("What do you want to search for?")
-
     
     while (True):
+        print("What do you want to search for?")
         choice=input("Press 1 for Author \nPress 2 for Title \nPress 3 for general search of subject/keyword \nPress -1 to exit\n")
         match choice:
             case "1":
