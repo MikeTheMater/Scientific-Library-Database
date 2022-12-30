@@ -5,7 +5,6 @@ import pandas as pd
 def searchforAuthorAndTitles(name):
     # Creating cursor object using connection object
     cursor = conn.cursor()
-    print(name)
     # executing our sql query
     cursor.execute("""SELECT p.Title  
             FROM (Publication as p join Composes as c on p.ID=c.PublicationID) join Author as a on c.AuthorID=a.ID
@@ -91,9 +90,64 @@ def showAuthors(title):
             FROM (Author as a join Composes as c on a.ID=c.AuthorID) join Publication as p on c.PublicationID=p.ID
             WHERE p.Title=?""", (title,))
     result=cursor.fetchall()
+    
     print("   First Name     Last Name      Affiliation")
     for i in range(len(result)):
         print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1],"  ", result[i][2])
+
+    print("Do you want to go to an Author's profile?")
+
+    author=int(input("Press the number next to the author you want.\n"))
+    
+    AuthorProfile(result[author-1][0],result[author-1][1])
+
+def AuthorProfile(fname,lname):
+    cursor = conn.cursor()
+    # executing our sql query
+    print(fname,lname)
+    #find publications each year
+    
+    cursor.execute("""SELECT p.Year, count(*) as "Number of Publications"
+                    FROM (Author as a JOIN Composes as c on a.ID= c.AuthorID) JOIN Publication as p on c.PublicationID= p.ID
+                    WHERE a.FirstName=? and a.LastName= ?
+                    GROUP by a.LastName, p.Year
+                    ORDER by p.Year""", (fname,lname,))
+    result=cursor.fetchall()
+    
+    print(" Number of publications for {} {} each year.".format(fname,lname))
+    for i in range(len(result)):
+        print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1])
+    
+    cursor.execute("""SELECT  a.FirstName ,a.LastName, count(*) as "Number of Collaborations"
+                    FROM Author as a JOIN Composes as c on a.ID= c.AuthorID
+                    WHERE c.PublicationID in ( SELECT DISTINCT c.PublicationID
+                                                FROM Author as a JOIN Composes as c on a.ID= c.AuthorID
+                                                WHERE a.LastName= ? AND a.FirstName= ? )
+                                            AND a.LastName!= ? AND a.FirstName!= ?
+                    GROUP by a.LastName, a.FirstName
+                    ORDER by "Number of Collaborations" DESC, a.LastName
+                    LIMIT 2""", (fname,lname,fname,lname,))
+    result=cursor.fetchall()
+    if(len(result)==2):
+        print(" Top 2 co-authors of {} {} and the number of their common publications.".format(fname,lname))
+        for i in range(len(result)):
+            print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1], " ", result[i][2])
+        
+        co_author=int(input("If you want to view a co author's profile press the number next to him.\nElse press -1\n"))
+        match co_author:
+            case 1:
+                AuthorProfile(result[0][0], result[0][1])
+            case 2:
+                AuthorProfile(result[1][0], result[1][1])
+    
+    publ=input("Do you want to show the author's articles and books?(Yes to show/No to go in home screen)\n")
+
+    match publ:
+        case "Yes":
+            
+            searchforAuthorAndTitles([fname,lname])
+        case "No":
+            makechoice()
 
 #search for Author's First and Last name based on the Name that user typed
 def searchforAuthor(name):
@@ -105,10 +159,16 @@ def searchforAuthor(name):
         # executing our sql query
         cursor.execute("SELECT a.FirstName, a.LastName  FROM Author as a  WHERE a.LastName= :name or a.FirstName= :name ", {'name':name[0]})
         result=cursor.fetchall()
-        print("Authors\n First Name  Last Name")
-        for i in range(len(result)):
-            
-            print("{} ".format(i+1),result[i][0], " ",result[i][1])
+        if(len(result)>0):
+            print("Authors\n First Name  Last Name")
+            for i in range(len(result)):
+                
+                print("{} ".format(i+1),result[i][0], " ",result[i][1])
+            author=int(input("If you want to show more information about one Author press the number next to him to go to his profile \nElse press -1 to get back\n"))
+            if author==-1: makechoice()
+
+            AuthorProfile(result[author-1][0],result[author-1][1])
+        else: print("No match")
     elif len(name)==2:
         # Creating cursor object using connection object
         cursor = conn.cursor()
@@ -116,26 +176,31 @@ def searchforAuthor(name):
         # executing our sql query
         cursor.execute("SELECT a.FirstName, a.LastName  FROM Author as a  WHERE (a.LastName= :name2 and a.FirstName= :name1) or (a.LastName= :name1 and a.FirstName= :name2) ", {'name1':name[0],'name2':name[1]})
         result=cursor.fetchall()
-        print("Authors\n First Name  Last Name")
-        for i in range(len(result)):
-            print("{} ".format(i+1),result[i][0], " ",result[i][1])
-    author=int(input("If you want to show more information about one Author press the number next to him \nElse press -1 to get back\n"))
-    if author==-1: makechoice()
+        if(len(result)>0):
+            print("Authors\n First Name  Last Name")
+            for i in range(len(result)):
+                print("{} ".format(i+1),result[i][0], " ",result[i][1])
+            author=int(input("If you want to show more information about one Author press the number next to him to go to his profile \nElse press -1 to get back\n"))
+            if author==-1: makechoice()
 
-    searchforAuthorAndTitles(result[author-1])
+            AuthorProfile(result[author-1][0],result[author-1][1])
+        else: print("No match")
+    
 
 #search for titles that have the words that the user gives
 def searchforTitle(title):
     cursor = conn.cursor()
     cursor.execute("SELECT p.Title  FROM Publication as p  WHERE p.Title like :title ", (f'%{title}%',))
     result=cursor.fetchall()
-    print("Titles")
-    for i in range(len(result)):
-        print("{} ".format(i+1),result[i][0])
-    choice=int(input("If you want to show more information about one Publication press the number next to him\nElse press -1 to get back\n"))
-    if choice==-1: makechoice()
+    if(len(result)>0):
+        print("Titles")
+        for i in range(len(result)):
+            print("{} ".format(i+1),result[i][0])
+        choice=int(input("If you want to show more information about one Publication press the number next to him\nElse press -1 to get back\n"))
+        if choice==-1: makechoice()
 
-    publicationInfo(result[choice-1][0])
+        publicationInfo(result[choice-1][0])
+    else:print("No match")
 
 #search for titles that are about the given keyword
 def searchforKeyword(keyword):
