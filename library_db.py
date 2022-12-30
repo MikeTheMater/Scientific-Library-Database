@@ -13,23 +13,25 @@ def searchforAuthorAndTitles(name):
     print("Showing Publications of Author {} {}\n   Title".format(name[0],name[1]))
     for i in range(len(result)):
         print("{} ".format(i+1), result[i][0])
-
-    choice=int(input("If you want to show more information about one Publication press the number next to him\nElse press -1 to get back\n"))
+ 
+    choice=int(input("If you want to show more information about one Publication press the number next to its title \nElse press -1 to get back\n"))
     if choice==-1: makechoice()
 
-    publicationInfo(choice)
+    publicationInfo(result[choice-1][0])
 
 def publicationInfo(title):
     cursor = conn.cursor()
-    print(title)
     # executing our sql query
-    cursor.execute("""SELECT p.Title , ar.DOI , ar.[Print ISSN], ar.[Electronic ISSN], ar.[Online ISSN], ar.Conference
+    cursor.execute("""SELECT Distinct p.Title , ar.DOI , ar.[Print ISSN], ar.[Electronic ISSN], ar.[Online ISSN], ar.Conference, ar.[Science Magazine]
             FROM ((Article as ar join Publication as p on p.ID=ar.ID) join Composes as c on c.PublicationID=p.ID) join Author as a on a.ID=c.AuthorID
-            WHERE p.Title=?""", (title))
+            WHERE p.Title=?""", (title,))
     result=cursor.fetchall()
-    print("Title   DOI    Print ISSN    Electronic ISSN     Online ISSN     Conference     Science Magazine\n")
+    print("Title   DOI    Print ISSN    Electronic ISSN     Online ISSN     Conference     Science Magazine")
     for i in range(len(result)):
-        print("{} ".format(i+1), result[i][0], result[i][1], result[i][2], result[i][3], result[i][4,], result[i][5] )
+        print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1],"  ", result[i][2],"  " ,result[i][3],"  ", result[i][4],"  ", result[i][5], " ", result[i][6] )
+    
+    choice=input("Press 1 to show the Authors \nPress 2 to show References \nPress 3 to show citations \nPress -1 to exit\n")
+    
 
 def searchforAuthor(name):
     name=name.split(" ")
@@ -70,7 +72,7 @@ def searchforTitle(title):
     choice=int(input("If you want to show more information about one Publication press the number next to him\nElse press -1 to get back\n"))
     if choice==-1: makechoice()
 
-    publicationInfo(choice)
+    publicationInfo(result[choice-1][0])
     
 def searchforKeyword(keyword):
     cursor = conn.cursor()
