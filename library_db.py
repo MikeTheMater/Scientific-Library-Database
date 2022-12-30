@@ -1,6 +1,7 @@
 import sqlite3
 import pandas as pd
 
+#search for the publication titles that an author has writen
 def searchforAuthorAndTitles(name):
     # Creating cursor object using connection object
     cursor = conn.cursor()
@@ -19,6 +20,7 @@ def searchforAuthorAndTitles(name):
 
     publicationInfo(result[choice-1][0])
 
+#search for information on the publication with the given title
 def publicationInfo(title):
     cursor = conn.cursor()
     # executing our sql query
@@ -30,9 +32,70 @@ def publicationInfo(title):
     for i in range(len(result)):
         print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1],"  ", result[i][2],"  " ,result[i][3],"  ", result[i][4],"  ", result[i][5], " ", result[i][6] )
     
-    choice=input("Press 1 to show the Authors \nPress 2 to show References \nPress 3 to show citations \nPress -1 to exit\n")
+    choice=int(input("Press 1 to show the Authors \nPress 2 to show References \nPress 3 to show citations \nPress 4 to show Abstract \nPress -1 to exit\n"))
     
+    match choice:
+        case 1:
+            showAuthors(title)
+        case 2:
+            showReferences(title)
+        case 3:
+            showCitations(title)
+        case 4:
+            showAbstract(title)
+        case -1:makechoice()
 
+def showAbstract(title):
+    cursor = conn.cursor()
+    # executing our sql query
+    print(title)
+    cursor.execute("""SELECT p.Abstract
+            FROM Publication as p
+            WHERE p.Title=?""", (title,))
+    result=cursor.fetchall()
+    print("Abstract")
+    for i in range(len(result)):
+        print(result[i][0])
+
+
+def showCitations(title):
+    cursor = conn.cursor()
+    # executing our sql query
+    print(title)
+    cursor.execute("""SELECT a_c.Citations
+            FROM (Article_Citations as a_c join Article as c on a_c.ID=c.ID) join Publication as p on c.ID=p.ID
+            WHERE p.Title=?""", (title,))
+    result=cursor.fetchall()
+    print("Citations")
+    for i in range(len(result)):
+        print("{} ".format(i+1),"  " ,result[i][0])
+
+def showReferences(title):
+    cursor = conn.cursor()
+    # executing our sql query
+    print(title)
+    cursor.execute("""SELECT a_r.[References]
+            FROM (Article_References as a_r join Article as c on a_r.ID=c.ID) join Publication as p on c.ID=p.ID
+            WHERE p.Title=?""", (title,))
+    result=cursor.fetchall()
+    print("References")
+    for i in range(len(result)):
+        print("{} ".format(i+1),"  " ,result[i][0])
+
+#search for the authors of the publication and their affiliation
+def showAuthors(title):
+    cursor = conn.cursor()
+    # executing our sql query
+    print(title)
+    cursor.execute("""SELECT a.FirstName, a.LastName, c.Affiliation
+            FROM (Author as a join Composes as c on a.ID=c.AuthorID) join Publication as p on c.PublicationID=p.ID
+            WHERE p.Title=?""", (title,))
+    result=cursor.fetchall()
+    print("   First Name     Last Name      Affiliation")
+    for i in range(len(result)):
+        print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1],"  ", result[i][2])
+
+#search for Author's First and Last name based on the Name that user typed
 def searchforAuthor(name):
     name=name.split(" ")
     if len(name)==1:
@@ -61,7 +124,7 @@ def searchforAuthor(name):
 
     searchforAuthorAndTitles(result[author-1])
 
-
+#search for titles that have the words that the user gives
 def searchforTitle(title):
     cursor = conn.cursor()
     cursor.execute("SELECT p.Title  FROM Publication as p  WHERE p.Title like :title ", (f'%{title}%',))
@@ -73,7 +136,8 @@ def searchforTitle(title):
     if choice==-1: makechoice()
 
     publicationInfo(result[choice-1][0])
-    
+
+#search for titles that are about the given keyword
 def searchforKeyword(keyword):
     cursor = conn.cursor()
     cursor.execute("""SELECT DISTINCT a_k1.Keywords, p1.Title
