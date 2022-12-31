@@ -1,5 +1,5 @@
 import sqlite3
-import pandas as pd
+import string as str
 
 #search for the publication titles that an author has writen
 def searchforAuthorAndTitles(name):
@@ -15,9 +15,8 @@ def searchforAuthorAndTitles(name):
         print("{} ".format(i+1), result[i][0])
  
     choice=int(input("If you want to show more information about one Publication press the number next to its title \nElse press -1 to get back\n"))
-    if choice==-1: makechoice()
-
-    publicationInfo(result[choice-1][0])
+    if choice!=-1: publicationInfo(result[choice-1][0])
+    
 
 #search for information on the publication with the given title
 def publicationInfo(title):
@@ -31,37 +30,70 @@ def publicationInfo(title):
     for i in range(len(result)):
         print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1],"  ", result[i][2],"  " ,result[i][3],"  ", result[i][4],"  ", result[i][5], " ", result[i][6] )
     
-    choice=int(input("Press 1 to show the Authors \nPress 2 to show References \nPress 3 to show citations \nPress 4 to show Abstract \nPress -1 to exit\n"))
-    
-    match choice:
-        case 1:
-            showAuthors(title)
-            
-        case 2:
-            showReferences(title)
-            back=input("Do you want to return to Publication's information?(Yes/No)(Default Yes)\n")
-            if(back=="No"):
-                ex=input("Do you want to search for something else?(Yes/No)\n")
-                if (ex=="Yes"): makechoice()
-                else: quit()
-            else:publicationInfo(title)
-        case 3:
-            showCitations(title)
-            back=input("Do you want to return to Publication's information?(Yes/No)(Default Yes)\n")
-            if(back=="No"):
-                ex=input("Do you want to search for something else?(Yes/No)\n")
-                if (ex=="Yes"): makechoice()
-                else: quit()
-            else:publicationInfo(title)
-        case 4:
-            showAbstract(title)
-            back=input("Do you want to return to Publication's information?(Yes/No)(Default Yes)\n")
-            if(back=="No"):
-                ex=input("Do you want to search for something else?(Yes/No)\n")
-                if (ex=="Yes"): makechoice()
-                else: quit()
-            else:publicationInfo(title)
-        case -1:makechoice()
+    while(True):
+        choice=int(input("Press 1 to show the Authors \nPress 2 to show References \nPress 3 to show citations \nPress 4 to show Abstract \nPress -1 to exit\n"))
+        
+        match choice:
+            case 1:
+                showAuthors(title)
+                back=input("Do you want to return to Publication's information?(Yes/No)(Default Yes)\n")
+                if(back=="No"):
+                    ex=input("Do you want to search for something else?(Yes/No)\n")
+                    if (ex=="Yes"): 
+                        return   
+                    else: 
+                        quit()
+                elif (back=="Yes"):
+                    publicationInfo(title)
+                    break
+                else:
+                    print("Wrong in typing.\n")
+                    
+            case 2:
+                showReferences(title)
+                back=input("Do you want to return to Publication's information?(Yes/No)(Default Yes)\n")
+                if(back=="No"):
+                    ex=input("Do you want to search for something else?(Yes/No)\n")
+                    if (ex=="Yes"): 
+                        return
+                    else: 
+                        quit()
+                elif (back=="Yes"):
+                    publicationInfo(title)
+                    break
+                else:
+                    print("Wrong in typing.\n")
+                    
+            case 3:
+                back=input("Do you want to return to Publication's information?(Yes/No)(Default Yes)\n")
+                if(back=="No"):
+                    ex=input("Do you want to search for something else?(Yes/No)\n")
+                    if (ex=="Yes"): 
+                        return
+                    else: 
+                        quit()
+                elif (back=="Yes"):
+                    publicationInfo(title)
+                    break
+                else:
+                    print("Wrong in typing.\n")
+                    
+            case 4:
+                back=input("Do you want to return to Publication's information?(Yes/No)(Default Yes)\n")
+                if(back=="No"):
+                    ex=input("Do you want to search for something else?(Yes/No)\n")
+                    if (ex=="Yes"): 
+                        return
+                    else: 
+                        quit()
+                elif (back=="Yes"):
+                    publicationInfo(title)
+                    break
+                else:
+                    print("Wrong in typing.\n")
+                    
+            case -1:
+                return
     
 
 def showAbstract(title):
@@ -117,9 +149,16 @@ def showAuthors(title):
 
     print("Do you want to go to an Author's profile?")
 
-    author=int(input("Press the number next to the author you want.\n"))
-    
-    AuthorProfile(result[author-1][0],result[author-1][1])
+    while(True):
+        author=input("Press the number next to the author you want or Press -1 to go back.\n")
+        if author.isnumeric()==False:print("Wrong insertion type again.\n")
+        elif int(author)>0 and int(author)<len(result): 
+            AuthorProfile(result[int(author)-1][0],result[int(author)-1][1])
+            break
+        elif author=="-1":
+            break
+        else:print("Wrong insertion type again.\n")
+
 
 def AuthorProfile(fname,lname):
     cursor = conn.cursor()
@@ -142,32 +181,39 @@ def AuthorProfile(fname,lname):
                     FROM Author as a JOIN Composes as c on a.ID= c.AuthorID
                     WHERE c.PublicationID in ( SELECT DISTINCT c.PublicationID
                                                 FROM Author as a JOIN Composes as c on a.ID= c.AuthorID
-                                                WHERE a.LastName= ? AND a.FirstName= ? )
-                                            AND a.LastName!= ? AND a.FirstName!= ?
+                                                WHERE a.FirstName= ? AND a.LastName= ?)
+                                             AND a.FirstName!= ? AND a.LastName!= ?
                     GROUP by a.LastName, a.FirstName
                     ORDER by "Number of Collaborations" DESC, a.LastName
                     LIMIT 2""", (fname,lname,fname,lname,))
     result=cursor.fetchall()
-    if(len(result)==2):
+    if(len(result)>0):
         print(" Top 2 co-authors of {} {} and the number of their common publications.".format(fname,lname))
         for i in range(len(result)):
             print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1], " ", result[i][2])
         
-        co_author=int(input("If you want to view a co author's profile press the number next to him.\nElse press -1\n"))
-        match co_author:
-            case 1:
-                AuthorProfile(result[0][0], result[0][1])
-            case 2:
-                AuthorProfile(result[1][0], result[1][1])
+        while(True):
+            co_author=int(input("If you want to view a co author's profile press the number next to him.\nElse press -1\n"))
+            match co_author:
+                case 1:
+                    AuthorProfile(result[0][0], result[0][1])
+                    break
+                case 2:
+                    AuthorProfile(result[1][0], result[1][1])
+                    break
+                case -1:
+                    break
+                case other:
+                    print("No match, type again.\n")
+
     
-    publ=input("Do you want to show the author's articles and books?(Yes to show/No to go in home screen)\n")
+    publ=input("Do you want to show the author's ({} {}) articles and books?(Yes to show/No to go back)\n".format(fname,lname))
 
     match publ:
         case "Yes":
-            
             searchforAuthorAndTitles([fname,lname])
         case "No":
-            makechoice()
+            return
 
 #search for Author's First and Last name based on the Name that user typed
 def searchforAuthor(name):
@@ -186,8 +232,7 @@ def searchforAuthor(name):
                 print("{} ".format(i+1),result[i][0], " ",result[i][1])
             author=int(input("If you want to show more information about one Author press the number next to him to go to his profile \nElse press -1 to get back\n"))
             if author==-1: makechoice()
-
-            AuthorProfile(result[author-1][0],result[author-1][1])
+            else:  AuthorProfile(result[author-1][0],result[author-1][1])
         else: print("No match")
     elif len(name)==2:
         # Creating cursor object using connection object
@@ -202,8 +247,7 @@ def searchforAuthor(name):
                 print("{} ".format(i+1),result[i][0], " ",result[i][1])
             author=int(input("If you want to show more information about one Author press the number next to him to go to his profile \nElse press -1 to get back\n"))
             if author==-1: makechoice()
-
-            AuthorProfile(result[author-1][0],result[author-1][1])
+            else:AuthorProfile(result[author-1][0],result[author-1][1])
         else: print("No match")
     
 
@@ -219,18 +263,18 @@ def searchforTitle(title):
         choice=int(input("If you want to show more information about one Publication press the number next to him\nElse press -1 to get back\n"))
         if choice==-1: makechoice()
 
-        publicationInfo(result[choice-1][0])
+        else:publicationInfo(result[choice-1][0])
     else:print("No match")
 
 #search for titles that are about the given keyword
 def searchforKeyword(keyword):
     cursor = conn.cursor()
-    cursor.execute("""SELECT DISTINCT a_k1.Keywords, p1.Title
+    cursor.execute("""SELECT DISTINCT a_k1.Keywords, p1.Title, 'Article'
     FROM Publication as p1 JOIN Article_Keywords as a_k1 on p1.ID= a_k1.ID,
             Publication as p2 JOIN Article_Keywords as a_k2 on p2.ID= a_k2.ID
     WHERE a_k1.Keywords like ?
     UNION
-    SELECT DISTINCT c_k1.Keywords, c1.Title
+    SELECT DISTINCT c_k1.Keywords, c1.Title, 'Chapter'
     FROM Chapter as c1 JOIN Chapter_Keywords as c_k1 on c1.ID= c_k1.ID,
             Chapter as c2 JOIN Chapter_Keywords as c_k2 on c2.ID= c_k2.ID
     WHERE c_k1.Keywords like ?
@@ -239,10 +283,9 @@ def searchforKeyword(keyword):
     print("Keyword  Title")
     for i in range(len(result)):
         
-        print("{} ".format(i+1),result[i][0], " ",result[i][1])
+        print("{} ".format(i+1),result[i][0], " ",result[i][1], " ", result[i][2])
 
 def makechoice():
-    
     while (True):
         print("What do you want to search for?")
         choice=input("Press 1 for Author \nPress 2 for Title \nPress 3 for general search of subject/keyword \nPress -1 to exit\n")
@@ -256,7 +299,12 @@ def makechoice():
             case "3":
                 keyword=input("Type the keyword you are looking for\n")
                 searchforKeyword(keyword)
-            case "-1":break
+            case "-1":quit()
+            case other:
+                print("Wrong input type again.")
+
+#def back():
+
 
 conn=sqlite3.connect('Scientific_Libary.db')
 
