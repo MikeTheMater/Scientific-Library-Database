@@ -193,27 +193,36 @@ def AuthorProfile(fname,lname):
             print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1], " ", result[i][2])
         
         while(True):
-            co_author=int(input("If you want to view a co author's profile press the number next to him.\nElse press -1\n"))
-            match co_author:
-                case 1:
-                    AuthorProfile(result[0][0], result[0][1])
-                    break
-                case 2:
-                    AuthorProfile(result[1][0], result[1][1])
-                    break
-                case -1:
-                    break
-                case other:
-                    print("No match, type again.\n")
+            auth=input("Do you want to show an author's profile?(Yes/No)\n")
+            if(auth=="Yes"):
+                while(True):
+                    co_author=int(input("If you want to view a co author's profile press the number next to him.\nElse press -1\n"))
+                    match co_author:
+                        case 1:
+                            AuthorProfile(result[0][0], result[0][1])
+                            break
+                        case 2:
+                            AuthorProfile(result[1][0], result[1][1])
+                            break
+                        case -1:
+                            break
+                        case other:
+                            print("No match, type again.\n")
+            elif(auth=="No"):
+                break
+            else:
+                print("Wrong input, type again.\n")
 
-    
-    publ=input("Do you want to show the author's ({} {}) articles and books?(Yes to show/No to go back)\n".format(fname,lname))
-
-    match publ:
-        case "Yes":
-            searchforAuthorAndTitles([fname,lname])
-        case "No":
-            return
+    while (True):
+        publ=input("Do you want to show the author's ({} {}) articles and books?(Yes to show/No to go back)\n".format(fname,lname))
+        match publ:
+            case "Yes":
+                searchforAuthorAndTitles([fname,lname])
+                break
+            case "No":
+                return
+            case other:
+                print("Wrong input, type again.\n")
 
 #search for Author's First and Last name based on the Name that user typed
 def searchforAuthor(name):
@@ -280,11 +289,67 @@ def searchforKeyword(keyword):
     WHERE c_k1.Keywords like ?
     ORDER by a_k1.Keywords, c_k1.Keywords """, (f'%{keyword}%',f'%{keyword}%',))
     result=cursor.fetchall()
-    print("Keyword  Title")
+
+    print("Keyword      Title")
     for i in range(len(result)):
-        
         print("{} ".format(i+1),result[i][0], " ",result[i][1], " ", result[i][2])
 
+    while (True):
+        choice=input("If you want to select one publication press the number next to it.\n Else press -1 to go back.\n")
+
+        if int(choice)>0 and int(choice)<=len(result):
+            if result[int(choice)-1][2]=="Article":
+                publicationInfo(result[int(choice)-1][1])
+                break
+            elif result[int(choice)-1][2]=="Chapter":
+                chapterInfo(result[int(choice)-1][1])
+                break
+        elif choice=="-1":
+            return
+        else:
+            print("Wrong input, type again.")
+
+def chapterInfo(title):
+    cursor = conn.cursor()
+    # executing our sql query
+    cursor.execute("""SELECT Distinct ch.Title , ch.DOI , ch.Abstract, p.Title, a.FirstName, a.LastName, Publisher.Name
+                    FROM Chapter as ch, Scientific_Book as sb, (Publication as p join Composes as c on p.ID=c.PublicationID) join Author as a on a.ID=c.AuthorID, Publisher
+                    WHERE ch.Title=? and ch.BookID=sb.ID AND p.ID=sb.ID and sb.PublisherID=Publisher.ID""", (title,))
+    result=cursor.fetchall()
+    print(result)
+    print("The chapter {} is part of: {}\n".format(result[0][0], result[0][3]))
+    print("DOI:{}".format(result[0][1]))
+    print("Publisher:{}".format(result[0][6]))
+    while(True):
+        abstr=input("Do you want to show Chapter's Abstract?(Yes/No)\n")
+        if abstr=="Yes": 
+            print(result[0][2])
+            break
+        elif abstr=="No": 
+            break
+        else:
+            print("Wrong input, type again")
+    
+    
+    while(True):
+        auth=input("Do you want to show abstract's authors?(Yes/No)")
+        if auth=="Yes": 
+            for i in range(len(result)):
+                print("{} ".format(i+1),result[i][4], result[i][5])
+            while(True):
+                pr=input("If you want to show an author's profile press the number next to him.\n Else press -1.\n")
+                if int(pr)>0 and int(pr)<=len(result):
+                    AuthorProfile(result[int(pr)-1][4], result[int(pr)-1][5])
+                elif pr=="-1": 
+                    break
+                else:
+                    print("Wrong input, type again")    
+            break
+        elif auth=="No": 
+            break
+        else:
+            print("Wrong input, type again")
+    
 def makechoice():
     while (True):
         print("What do you want to search for?")
