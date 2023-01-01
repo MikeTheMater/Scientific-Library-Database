@@ -1,6 +1,6 @@
 import sqlite3
 
-def book():
+def book(conn):
     bookTitle=input("Type the book's title.\n")
     bookAbstract=input("Type the book's abstract.\n")
     publicationYear=input("Year of publication.\n")
@@ -11,19 +11,19 @@ def book():
     cur.execute(publ_sql,(bookTitle,bookAbstract,publicationYear))
     conn.commit()
 
-    publicationID=findPublicationID(bookTitle)
+    publicationID=findPublicationID(bookTitle, conn)
     
     #checking if the publisher already exists in database and if he doesn't i add him
     publisherName=input("Type the publisher's name.\n")
-    publisherID=findPublisherID(publisherName)
-    print(publisherID)
+    publisherID=findPublisherID(publisherName, conn)
+
     if len(publisherID)==0:
         pub_sql='''INSERT INTO Publisher(Name)
             VALUES(?)'''
         cur.execute(pub_sql,(publisherName,))
         conn.commit()
 
-        publisherID=findPublisherID(publisherName)
+        publisherID=findPublisherID(publisherName, conn)
 
     bookType=input("Type the book's type.\n")
     persistentLink=input("Type the book's persistent link.\n")
@@ -75,7 +75,7 @@ def book():
                 for k in keywords:
                     key_sql='''INSERT INTO Chapter_Keywords(ID, Keywords)
                                 VALUES(?,?)'''
-                    chapterID=findChapterID(chapterTitle)
+                    chapterID=findChapterID(chapterTitle, conn)
                     cur.execute(key_sql,(int(chapterID[0][0]),k))
                     conn.commit()
                 keyword_option=input("Do you want to add another keyword?(Yes/No)\n")
@@ -88,7 +88,7 @@ def book():
     while (True):
         bookAuthor=input("Type the Author's first name and last name.\n")
         bookAuthor=bookAuthor.split()
-        AuthorID=findAuthorID(bookAuthor)
+        AuthorID=findAuthorID(bookAuthor, conn)
         if len(AuthorID)==0:#checking if author is already in database by checking if there is an ID matching
             email=input("Author not in database, type author's mail(optional).\n")
             city=input("Type author's city.\n")
@@ -101,7 +101,7 @@ def book():
             conn.commit()
         else: affiliation=input("Type author's affiliation.\n")
 
-        AuthorID=findAuthorID(bookAuthor)
+        AuthorID=findAuthorID(bookAuthor, conn)
         #and i add composes to the database for both cases
         author_sql='''INSERT INTO Composes(AuthorID, PublicationID, Affiliation)
                 VALUES(?,?,?)'''
@@ -121,7 +121,7 @@ def book():
 
     print("Book import finished successfully.\n")
 
-def article():
+def article(conn):
     ArticleTitle=input("Type the book's title.\n")
     ArticleAbstract=input("Type the book's abstract.\n")
     publicationYear=input("Year of publication.\n")
@@ -132,12 +132,11 @@ def article():
     cur.execute(publ_sql,(ArticleTitle,ArticleAbstract,publicationYear))
     conn.commit()
 
-    publicationID=findPublicationID(ArticleTitle)
+    publicationID=findPublicationID(ArticleTitle, conn)
     
     #checking if the publisher already exists in database and if he doesn't i add him
     publisherName=input("Type the publisher's name.\n")
-    publisherID=findPublisherID(publisherName)
-    print(publisherID)
+    publisherID=findPublisherID(publisherName, conn)
 
     if len(publisherID)==0:
         pub_sql='''INSERT INTO Publisher(Name)
@@ -145,7 +144,7 @@ def article():
         cur.execute(pub_sql,(publisherName,))
         conn.commit()
 
-        publisherID=findPublisherID(publisherName)
+        publisherID=findPublisherID(publisherName, conn)
         
     ArticleDOI=input("Type the Article's DOI if it has one.(Else press enter)\n")
     if ArticleDOI=="":ArticleDOI=None
@@ -207,7 +206,7 @@ def article():
             for k in keywords:
                 key_sql='''INSERT INTO Article_Keywords(ID, Keywords)
                             VALUES(?,?)'''
-                publicationID=findPublicationID(ArticleTitle)
+                publicationID=findPublicationID(ArticleTitle, conn)
                 cur.execute(key_sql,(int(publicationID[0][0]),k))
                 conn.commit()
             keyword_option=input("Do you want to add another keyword?(Yes/No)\n")
@@ -220,7 +219,7 @@ def article():
     while (True):
         articleAuthor=input("Type the Author's first name and last name.\n")
         articleAuthor=articleAuthor.split()
-        AuthorID=findAuthorID(articleAuthor)
+        AuthorID=findAuthorID(articleAuthor, conn)
         if len(AuthorID)==0:#checking if author is already in database by checking if there is an ID matching
             email=input("Author not in database, type author's mail(optional).\n")
             city=input("Type author's city.\n")
@@ -233,7 +232,7 @@ def article():
             conn.commit()
         else: affiliation=input("Type author's affiliation.\n")
 
-        AuthorID=findAuthorID(articleAuthor)
+        AuthorID=findAuthorID(articleAuthor, conn)
         #and i add composes to the database for both cases
         author_sql='''INSERT INTO Composes(AuthorID, PublicationID, Affiliation)
                 VALUES(?,?,?)'''
@@ -253,7 +252,7 @@ def article():
 
     print("Article import finished successfully.\n")
 
-def findAuthorID(author):
+def findAuthorID(author, conn):
     cursor = conn.cursor()
     # executing our sql query
     cursor.execute("""SELECT a.ID
@@ -262,7 +261,7 @@ def findAuthorID(author):
     result=cursor.fetchall()
     return result
 
-def findChapterID(chapter):
+def findChapterID(chapter, conn):
     cursor = conn.cursor()
     # executing our sql query
     cursor.execute("""SELECT c.ID
@@ -271,7 +270,7 @@ def findChapterID(chapter):
     result=cursor.fetchall()
     return result
 
-def findPublisherID(publisher):
+def findPublisherID(publisher, conn):
     cursor = conn.cursor()
     # executing our sql query
     cursor.execute("""SELECT p.ID
@@ -281,7 +280,7 @@ def findPublisherID(publisher):
     
     return result
 
-def findPublicationID(title):
+def findPublicationID(title, conn):
     cursor = conn.cursor()
     # executing our sql query
     cursor.execute("""SELECT p.ID
@@ -291,28 +290,25 @@ def findPublicationID(title):
     return result
 
 
-        
-
-
-def uploadchoice():
+def uploadchoice(conn):
     while (True):
         print("What do you want to upload?")
         choice=input("Press 1 for Book \nPress 2 for Article \nPress -1 to exit\n")
         match choice:
             case "1":
-                book()
+                book(conn)
             case "2":
-                article()
+                article(conn)
             case "-1":
-                quit()
+                quit(conn)
             case other:
                 print("Wrong input type again.")
 
+if __name__=="__name__":
+    conn=sqlite3.connect('Scientific_Libary.db')
 
-conn=sqlite3.connect('Scientific_Libary.db')
+    print("Connected to SQLite")
+    
+    uploadchoice(conn)
 
-print("Connected to SQLite")
- 
-uploadchoice()
-
-conn.close()
+    conn.close()
