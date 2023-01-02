@@ -388,15 +388,15 @@ def searchforTitle(title, conn):
 def searchforKeyword(keyword, conn):
     cursor = conn.cursor()
     cursor.execute("""SELECT DISTINCT a_k1.Keywords, p1.Title, 'Article'
-    FROM Publication as p1 JOIN Article_Keywords as a_k1 on p1.ID= a_k1.ID,
-            Publication as p2 JOIN Article_Keywords as a_k2 on p2.ID= a_k2.ID
-    WHERE a_k1.Keywords like ?
-    UNION
-    SELECT DISTINCT c_k1.Keywords, c1.Title, 'Chapter'
-    FROM Chapter as c1 JOIN Chapter_Keywords as c_k1 on c1.ID= c_k1.ID,
-            Chapter as c2 JOIN Chapter_Keywords as c_k2 on c2.ID= c_k2.ID
-    WHERE c_k1.Keywords like ?
-    ORDER by a_k1.Keywords, c_k1.Keywords """, (f'%{keyword}%',f'%{keyword}%',))
+                    FROM Publication as p1 JOIN Article_Keywords as a_k1 on p1.ID= a_k1.ID,
+                            Publication as p2 JOIN Article_Keywords as a_k2 on p2.ID= a_k2.ID
+                    WHERE a_k1.Keywords like ?
+                    UNION
+                    SELECT DISTINCT c_k1.Keywords, c1.Title, 'Chapter'
+                    FROM Chapter as c1 JOIN Chapter_Keywords as c_k1 on c1.ID= c_k1.ID,
+                            Chapter as c2 JOIN Chapter_Keywords as c_k2 on c2.ID= c_k2.ID
+                    WHERE c_k1.Keywords like ?
+                    ORDER by a_k1.Keywords, c_k1.Keywords """, (f'%{keyword}%',f'%{keyword}%',))
     result=cursor.fetchall()
 
     print("Keyword      Title")
@@ -465,14 +465,20 @@ def makechoice(conn):
         choice=input("Press 1 for Author \nPress 2 for Title \nPress 3 for general search of subject/keyword \nPress -1 to exit\n")
         match choice:
             case "1":
-                name=input("Type the author you are looking for\n")
-                searchforAuthor(name, conn)
+                while(True):
+                    name=input("Type the author you are looking for\n")
+                    searchforAuthor(name, conn)
+                    break
             case "2":
-                title=input("Type the Title you are looking for\n")
-                searchforTitle(title, conn)
+                while(True):
+                    title=input("Type the Title you are looking for\n")
+                    searchforTitle(title, conn)
+                    break
             case "3":
-                keyword=input("Type the keyword you are looking for\n")
-                searchforKeyword(keyword, conn)
+                while(True):
+                    keyword=input("Type the keyword you are looking for\n")
+                    searchforKeyword(keyword, conn)
+                    break
             case "-1":quit()
             case other:
                 print("Wrong input type again.")
