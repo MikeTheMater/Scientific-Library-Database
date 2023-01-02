@@ -360,7 +360,7 @@ def searchforTitle(title, conn):
                     SELECT p.Title, "Scientific_Book"
                     FROM Publication as p JOIN Scientific_Book as sb on p.ID= sb.ID
                     WHERE p.Title like :title
-                    ORDER by p.Title ''', (f'%{title}%',f'%{title}%',))
+                    ORDER by p.Title ''', (f'%{title}%',))
     result=cursor.fetchall()
     if(len(result)>0):
         print("Titles")
