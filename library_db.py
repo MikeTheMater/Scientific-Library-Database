@@ -38,11 +38,7 @@ def articleInfo(title, conn, name):
                 showAuthors(title, conn)
                 back=input("Do you want to return to Article's information?(Yes/No)(Default Yes)\n")
                 if(back=="No"):
-                    ex=input("Do you want to search for something else?(Yes/No)\n")
-                    if (ex=="Yes"): 
-                        return   
-                    else: 
-                        quit()
+                    makechoice(conn)
                 elif (back=="Yes"):
                     articleInfo(title, conn, name)
                     break
@@ -53,11 +49,7 @@ def articleInfo(title, conn, name):
                 showReferences(title, conn)
                 back=input("Do you want to return to Article's information?(Yes/No)(Default Yes)\n")
                 if(back=="No"):
-                    ex=input("Do you want to search for something else?(Yes/No)\n")
-                    if (ex=="Yes"): 
-                        return
-                    else: 
-                        quit()
+                    makechoice(conn)
                 elif (back=="Yes"):
                     articleInfo(title, conn, name)
                     break
@@ -67,11 +59,7 @@ def articleInfo(title, conn, name):
             case 3:
                 back=input("Do you want to return to Article's information?(Yes/No)(Default Yes)\n")
                 if(back=="No"):
-                    ex=input("Do you want to search for something else?(Yes/No)\n")
-                    if (ex=="Yes"): 
-                        return
-                    else: 
-                        quit()
+                    makechoice(conn)
                 elif (back=="Yes"):
                     articleInfo(title, conn, name)
                     break
@@ -81,11 +69,7 @@ def articleInfo(title, conn, name):
             case 4:
                 back=input("Do you want to return to Article's information?(Yes/No)(Default Yes)\n")
                 if(back=="No"):
-                    ex=input("Do you want to search for something else?(Yes/No)\n")
-                    if (ex=="Yes"): 
-                        return
-                    else: 
-                        quit()
+                    makechoice(conn)
                 elif (back=="Yes"):
                     articleInfo(title, conn, name)
                     break
@@ -234,8 +218,7 @@ def showAuthors(title, conn):
 
     while(True):
         author=input("If you want to visit an author's profile press the number next to him,\n or press -1 to go back.\n")
-        if author.isnumeric()==False:print("Wrong insertion type again.\n")
-        elif int(author)>0 and int(author)<len(result): 
+        if int(author)>0 and int(author)<len(result): 
             AuthorProfile(result[int(author)-1][0],result[int(author)-1][1], conn)
             break
         elif author=="-1":
