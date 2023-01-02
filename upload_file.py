@@ -122,8 +122,8 @@ def book(conn):
     print("Book import finished successfully.\n")
 
 def article(conn):
-    ArticleTitle=input("Type the book's title.\n")
-    ArticleAbstract=input("Type the book's abstract.\n")
+    ArticleTitle=input("Type the Article's title.\n")
+    ArticleAbstract=input("Type the Article's abstract.\n")
     publicationYear=input("Year of publication.\n")
     #inserting Publication's information
     publ_sql='''INSERT INTO Publication(Title, Abstract,  Year)
@@ -159,7 +159,7 @@ def article(conn):
     scienceMagazine=input("Type the Science Magazine that the Article was published in, if it was published in a Science Magazine.(Else press enter)\n")
     if scienceMagazine=="":scienceMagazine=None
 
-    sb_sql='''INSERT INTO Articel(ID, PublisherID, DOI, [Print ISSN], [Electronic ISSN], [Online ISSN], Conference, [Science Magazine])
+    sb_sql='''INSERT INTO Article(ID, PublisherID, DOI, [Print ISSN], [Electronic ISSN], [Online ISSN], Conference, [Science Magazine])
             VALUES(?,?,?,?,?,?,?,?)'''
     cur.execute(sb_sql,(int(publicationID[0][0]), int(publisherID[0][0]), ArticleDOI, print_ISSN, electronic_ISSN, online_ISSN, articleConference, scienceMagazine))
     conn.commit()
@@ -303,6 +303,8 @@ def uploadchoice(conn):
                 quit(conn)
             case other:
                 print("Wrong input type again.")
+        choice=input("Do you want to add something else?.(Yes/No)\n")
+        if choice=="No":break
 
 if __name__=="__name__":
     conn=sqlite3.connect('Scientific_Libary.db')
