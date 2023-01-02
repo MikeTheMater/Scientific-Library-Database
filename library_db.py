@@ -5,7 +5,7 @@ def searchforAuthorAndTitles(name, conn):
     # Creating cursor object using connection object
     cursor = conn.cursor()
     # executing our sql query
-    cursor.execute("""SELECT p.Title  
+    cursor.execute("""SELECT p.Title
             FROM (Publication as p join Composes as c on p.ID=c.PublicationID) join Author as a on c.AuthorID=a.ID
             WHERE a.FirstName= ? and a.LastName= ? """,((name[0]),(name[1])))
     result=cursor.fetchall()
@@ -14,18 +14,19 @@ def searchforAuthorAndTitles(name, conn):
         print("{} ".format(i+1), result[i][0])
  
     choice=int(input("If you want to show more information about one Publication press the number next to its title \nElse press -1 to get back\n"))
-    if choice!=-1: articleInfo(result[choice-1][0], conn)
+    if choice<len(result) and choice>0: articleInfo(result[choice-1][0], conn, name)
+    elif choice==-1: searchforAuthorAndTitles(name, conn) 
     
 
 #search for information on the publication with the given title
-def articleInfo(title, conn):
+def articleInfo(title, conn, name):
     cursor = conn.cursor()
     # executing our sql query
     cursor.execute("""SELECT Distinct p.Title , ar.DOI , ar.[Print ISSN], ar.[Electronic ISSN], ar.[Online ISSN], ar.Conference, ar.[Science Magazine]
             FROM ((Article as ar join Publication as p on p.ID=ar.ID) join Composes as c on c.PublicationID=p.ID) join Author as a on a.ID=c.AuthorID
             WHERE p.Title=?""", (title,))
     result=cursor.fetchall()
-    print("Title   DOI    Print ISSN    Electronic ISSN     Online ISSN     Conference     Science Magazine")
+    print("    Title   DOI    Print ISSN    Electronic ISSN     Online ISSN     Conference     Science Magazine")
     for i in range(len(result)):
         print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1],"  ", result[i][2],"  " ,result[i][3],"  ", result[i][4],"  ", result[i][5], " ", result[i][6] )
     
@@ -43,7 +44,7 @@ def articleInfo(title, conn):
                     else: 
                         quit()
                 elif (back=="Yes"):
-                    articleInfo(title, conn)
+                    articleInfo(title, conn, name)
                     break
                 else:
                     print("Wrong in typing.\n")
@@ -58,7 +59,7 @@ def articleInfo(title, conn):
                     else: 
                         quit()
                 elif (back=="Yes"):
-                    articleInfo(title, conn)
+                    articleInfo(title, conn, name)
                     break
                 else:
                     print("Wrong in typing.\n")
@@ -72,7 +73,7 @@ def articleInfo(title, conn):
                     else: 
                         quit()
                 elif (back=="Yes"):
-                    articleInfo(title, conn)
+                    articleInfo(title, conn, name)
                     break
                 else:
                     print("Wrong in typing.\n")
@@ -86,22 +87,22 @@ def articleInfo(title, conn):
                     else: 
                         quit()
                 elif (back=="Yes"):
-                    articleInfo(title, conn)
+                    articleInfo(title, conn, name)
                     break
                 else:
                     print("Wrong in typing.\n")
                     
             case -1:
-                return
+                searchforAuthorAndTitles(name, conn)
 
-def bookInfo(title, conn):
+def bookInfo(title, conn, name):
     cursor = conn.cursor()
     # executing our sql query
     cursor.execute("""SELECT Distinct p.Title , sb.[Book Type], sb.[Persistent Link], sb.[Electronic pdf ISBN], sb.[Electronic epub ISBN], sb.[Online ISBN], sb.[Print ISBN]
             FROM ((Scientific_Book as sb join Publication as p on p.ID=sb.ID) join Composes as c on c.PublicationID=p.ID) join Author as a on a.ID=c.AuthorID
             WHERE p.Title=?""", (title,))
     result=cursor.fetchall()
-    print("Title   Persistent Link    Electronic pdf ISBN     Electronic epub ISBN     Online ISBN     Print ISBN")
+    print("    Title   Persistent Link    Electronic pdf ISBN     Electronic epub ISBN     Online ISBN     Print ISBN")
     for i in range(len(result)):
         print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1],"  ", result[i][2],"  " ,result[i][3],"  ", result[i][4],"  ", result[i][5], " ", result[i][6] )
     
@@ -149,13 +150,13 @@ def bookInfo(title, conn):
                     else: 
                         quit()
                 elif (back=="Yes"):
-                    articleInfo(title, conn)
+                    articleInfo(title, conn, name)
                     break
                 else:
                     print("Wrong in typing.\n")
                     
             case -1:
-                return
+                searchforAuthorAndTitles(name, conn)
 
 def showChapters(title, conn):
     cursor = conn.cursor()
@@ -266,10 +267,10 @@ def AuthorProfile(fname,lname, conn):
                         WHERE instr(a_c.Citations, t.Title)>0
                         GROUP by a_c.Year""", (fname,lname,))
     result=cursor.fetchall()
-    
-    print(" Number of citaitons for {} {} each year.".format(fname,lname))
-    for i in range(len(result)):
-        print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1])
+    if len(result)<0:
+        print(" Number of citaitons for {} {} each year.".format(fname,lname))
+        for i in range(len(result)):
+            print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1])
 
     cursor.execute("""SELECT  a.FirstName ,a.LastName, count(*) as "Number of Collaborations"
                     FROM Author as a JOIN Composes as c on a.ID= c.AuthorID
@@ -310,7 +311,7 @@ def AuthorProfile(fname,lname, conn):
                 
                 break
             case "No":
-                return
+                break
             case other:
                 print("Wrong input, type again.\n")
 
@@ -330,7 +331,7 @@ def searchforAuthor(name, conn):
                 
                 print("{} ".format(i+1),result[i][0], " ",result[i][1])
             author=int(input("If you want to show more information about one Author press the number next to him to go to his profile \nElse press -1 to get back\n"))
-            if author==-1: makechoice()
+            if author==-1: return
             else:  AuthorProfile(result[author-1][0],result[author-1][1], conn)
         else: print("No match")
     elif len(name)==2:
@@ -345,7 +346,7 @@ def searchforAuthor(name, conn):
             for i in range(len(result)):
                 print("{} ".format(i+1),result[i][0], " ",result[i][1])
             author=int(input("If you want to show more information about one Author press the number next to him to go to his profile \nElse press -1 to get back\n"))
-            if author==-1: makechoice()
+            if author==-1: return
             else:AuthorProfile(result[author-1][0],result[author-1][1], conn)
         else: print("No match")
     
@@ -373,7 +374,7 @@ def searchforTitle(title, conn):
 
             if int(choice)>0 and int(choice)<=len(result):
                 if result[int(choice)-1][1]=="Article":
-                    articleInfo(result[int(choice)-1][0], conn)
+                    articleInfo(result[int(choice)-1][0], conn, None)
                     break
                 elif result[int(choice)-1][1]=="Scientific Book":
                     bookInfo(result[int(choice)-1][0], conn)
@@ -408,7 +409,7 @@ def searchforKeyword(keyword, conn):
 
         if int(choice)>0 and int(choice)<=len(result):
             if result[int(choice)-1][2]=="Article":
-                articleInfo(result[int(choice)-1][1], conn)
+                articleInfo(result[int(choice)-1][1], conn, None)
                 break
             elif result[int(choice)-1][2]=="Chapter":
                 chapterInfo(result[int(choice)-1][1], conn)
@@ -466,19 +467,20 @@ def makechoice(conn):
         match choice:
             case "1":
                 while(True):
-                    name=input("Type the author you are looking for\n")
+                    name=input("Type the author you are looking for. Or type <<back>> to go back\n")
+                    if name=="back": break
                     searchforAuthor(name, conn)
-                    break
+
             case "2":
                 while(True):
-                    title=input("Type the Title you are looking for\n")
+                    title=input("Type the Title you are looking for.\n")
+                    if name=="Back": break
                     searchforTitle(title, conn)
-                    break
             case "3":
                 while(True):
-                    keyword=input("Type the keyword you are looking for\n")
+                    keyword=input("Type the keyword you are looking for.\n")
+                    if name=="Back": break
                     searchforKeyword(keyword, conn)
-                    break
             case "-1":quit()
             case other:
                 print("Wrong input type again.")
