@@ -365,18 +365,18 @@ def searchforTitle(title, conn):
     if(len(result)>0):
         print("Titles")
         for i in range(len(result)):
-            print("{} ".format(i+1),result[i][0])
+            print("{} ".format(i+1), result[i][0])
         choice=int(input("If you want to show more information about one Publication press the number next to it.\nElse press -1 to get back.\n"))
 
         while (True):
             choice=input("If you want to select one publication press the number next to it.\n Else press -1 to go back.\n")
 
             if int(choice)>0 and int(choice)<=len(result):
-                if result[int(choice)-1][2]=="Article":
-                    articleInfo(result[int(choice)-1][1], conn)
+                if result[int(choice)-1][1]=="Article":
+                    articleInfo(result[int(choice)-1][0], conn)
                     break
-                elif result[int(choice)-1][2]=="Scientific_Book":
-                    bookInfo(result[int(choice)-1][1], conn)
+                elif result[int(choice)-1][1]=="Scientific_Book":
+                    bookInfo(result[int(choice)-1][0], conn)
                     break
             elif choice=="-1":
                 return
