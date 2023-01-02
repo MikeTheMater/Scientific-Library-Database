@@ -14,8 +14,10 @@ def searchforAuthorAndTitles(name, conn):
         print("{} ".format(i+1), result[i][0])
  
     choice=int(input("If you want to show more information about one Publication press the number next to its title \nElse press -1 to get back\n"))
-    if choice<len(result) and choice>0: articleInfo(result[choice-1][0], conn, name)
-    elif choice==-1: searchforAuthorAndTitles(name, conn) 
+    if choice<len(result) and choice>0: 
+        articleInfo(result[choice-1][0], conn, name)
+        return
+    elif choice==-1: return
     
 
 #search for information on the publication with the given title
@@ -31,14 +33,15 @@ def articleInfo(title, conn, name):
         print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1],"  ", result[i][2],"  " ,result[i][3],"  ", result[i][4],"  ", result[i][5], " ", result[i][6] )
     
     while(True):
-        choice=int(input("Press 1 to show the Authors \nPress 2 to show References \nPress 3 to show citations \nPress 4 to show Abstract \nPress -1 to exit\n"))
+        choice=int(input("Press 1 to show the Authors \nPress 2 to show References \nPress 3 to show Citations \nPress 4 to show Abstract \nPress -1 to exit\n"))
         
         match choice:
             case 1:
                 showAuthors(title, conn)
                 back=input("Do you want to return to Article's information?(Yes/No)(Default Yes)\n")
                 if(back=="No"):
-                    makechoice(conn)
+                    searchforAuthorAndTitles(name, conn)
+                    break
                 elif (back=="Yes"):
                     articleInfo(title, conn, name)
                     break
@@ -49,7 +52,8 @@ def articleInfo(title, conn, name):
                 showReferences(title, conn)
                 back=input("Do you want to return to Article's information?(Yes/No)(Default Yes)\n")
                 if(back=="No"):
-                    makechoice(conn)
+                    searchforAuthorAndTitles(name, conn)
+                    break
                 elif (back=="Yes"):
                     articleInfo(title, conn, name)
                     break
@@ -57,9 +61,11 @@ def articleInfo(title, conn, name):
                     print("Wrong in typing.\n")
                     
             case 3:
+                showCitations(title, conn)
                 back=input("Do you want to return to Article's information?(Yes/No)(Default Yes)\n")
                 if(back=="No"):
-                    makechoice(conn)
+                    searchforAuthorAndTitles(name, conn)
+                    break
                 elif (back=="Yes"):
                     articleInfo(title, conn, name)
                     break
@@ -67,9 +73,11 @@ def articleInfo(title, conn, name):
                     print("Wrong in typing.\n")
                     
             case 4:
+                showAbstract(title, conn)
                 back=input("Do you want to return to Article's information?(Yes/No)(Default Yes)\n")
                 if(back=="No"):
-                    makechoice(conn)
+                    searchforAuthorAndTitles(name, conn)
+                    break
                 elif (back=="Yes"):
                     articleInfo(title, conn, name)
                     break
@@ -78,6 +86,7 @@ def articleInfo(title, conn, name):
                     
             case -1:
                 searchforAuthorAndTitles(name, conn)
+                break
 
 def bookInfo(title, conn, name):
     cursor = conn.cursor()
@@ -96,13 +105,10 @@ def bookInfo(title, conn, name):
         match choice:
             case 1:
                 showAuthors(title, conn)
-                back=input("Do you want to return to Book's information?(Yes/No)(Default Yes)\n")
+                back=input("Do you want to return to Book's information?(Yes/No)\n")
                 if(back=="No"):
-                    ex=input("Do you want to search for something else?(Yes/No)\n")
-                    if (ex=="Yes"): 
-                        return   
-                    else: 
-                        quit()
+                    searchforAuthorAndTitles(name, conn)
+                    break
                 elif (back=="Yes"):
                     bookInfo(title, conn)
                     break
@@ -111,13 +117,10 @@ def bookInfo(title, conn, name):
                     
             case 2:
                 showAbstract(title, conn)
-                back=input("Do you want to return to Book's information?(Yes/No)(Default Yes)\n")
+                back=input("Do you want to return to Book's information?(Yes/No)\n")
                 if(back=="No"):
-                    ex=input("Do you want to search for something else?(Yes/No)\n")
-                    if (ex=="Yes"): 
-                        return
-                    else: 
-                        quit()
+                    searchforAuthorAndTitles(name, conn)
+                    break
                 elif (back=="Yes"):
                     bookInfo(title, conn)
                     break
@@ -126,13 +129,10 @@ def bookInfo(title, conn, name):
                     
             case 3:
                 showChapters(title, conn)
-                back=input("Do you want to return to Book's information?(Yes/No)(Default Yes)\n")
+                back=input("Do you want to return to Book's information?(Yes/No)\n")
                 if(back=="No"):
-                    ex=input("Do you want to search for something else?(Yes/No)\n")
-                    if (ex=="Yes"): 
-                        return
-                    else: 
-                        quit()
+                    searchforAuthorAndTitles(name, conn)
+                    break
                 elif (back=="Yes"):
                     articleInfo(title, conn, name)
                     break
@@ -166,12 +166,11 @@ def showChapters(title, conn):
 def showAbstract(title, conn):
     cursor = conn.cursor()
     # executing our sql query
-    print(title)
     cursor.execute("""SELECT p.Abstract
             FROM Publication as p
             WHERE p.Title=?""", (title,))
     result=cursor.fetchall()
-    print("Abstract of {}.".format(title))
+    print("Abstract of {}.\n".format(title))
     for i in range(len(result)):
         print(result[i][0])
 
@@ -179,24 +178,21 @@ def showAbstract(title, conn):
 def showCitations(title, conn):
     cursor = conn.cursor()
     # executing our sql query
-    print(title)
     cursor.execute("""SELECT a_c.Citations
             FROM (Article_Citations as a_c join Article as c on a_c.ID=c.ID) join Publication as p on c.ID=p.ID
             WHERE p.Title=?""", (title,))
     result=cursor.fetchall()
-    print("Citations of {}.".format(title))
+    print("Citations of {}.\n".format(title))
     for i in range(len(result)):
         print("{} ".format(i+1),"  " ,result[i][0])
 
 def showReferences(title, conn):
     cursor = conn.cursor()
-    # executing our sql query
-    print(title)
     cursor.execute("""SELECT a_r.[References]
             FROM (Article_References as a_r join Article as c on a_r.ID=c.ID) join Publication as p on c.ID=p.ID
             WHERE p.Title=?""", (title,))
     result=cursor.fetchall()
-    print("References of {}.".format(title))
+    print("References of {}.\n".format(title))
     for i in range(len(result)):
         print("{} ".format(i+1),"  " ,result[i][0])
 
@@ -350,7 +346,6 @@ def searchforTitle(title, conn):
         print("Titles")
         for i in range(len(result)):
             print("{} ".format(i+1), result[i][0], result[i][1])
-        choice=int(input("If you want to show more information about one Publication press the number next to it.\nElse press -1 to get back.\n"))
 
         while (True):
             choice=input("If you want to select one publication press the number next to it.\n Else press -1 to go back.\n")
@@ -392,7 +387,7 @@ def searchforKeyword(keyword, conn):
 
         if int(choice)>0 and int(choice)<=len(result):
             if result[int(choice)-1][2]=="Article":
-                articleInfo(result[int(choice)-1][1], conn, None)
+                articleInfo(result[int(choice)-1][1], conn, "")
                 break
             elif result[int(choice)-1][2]=="Chapter":
                 chapterInfo(result[int(choice)-1][1], conn)
@@ -456,13 +451,13 @@ def makechoice(conn):
 
             case "2":
                 while(True):
-                    title=input("Type the Title you are looking for.\n")
-                    if name=="Back": break
+                    title=input("Type the Title you are looking for. Or type <<back>> to go back\n")
+                    if title=="back": break
                     searchforTitle(title, conn)
             case "3":
                 while(True):
-                    keyword=input("Type the keyword you are looking for.\n")
-                    if name=="Back": break
+                    keyword=input("Type the keyword you are looking for. Or type <<back>> to go back\n")
+                    if keyword=="back": break
                     searchforKeyword(keyword, conn)
             case "-1":quit()
             case other:
