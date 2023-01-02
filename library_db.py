@@ -262,7 +262,7 @@ def AuthorProfile(fname,lname, conn):
     cursor.execute("""SELECT a_c.Year, count(*) as "Citations per Year"
                         FROM Article_Citations as a_c JOIN (SELECT p.Title
                                                             FROM (Author as a JOIN Composes as c on a.ID= c.AuthorID) JOIN Publication as p on c.PublicationID= p.ID
-                                                            WHERE a.FirstName= "Weixing" AND a.LastName= "Ji") as t
+                                                            WHERE a.FirstName= ? AND a.LastName= ?) as t
                         WHERE instr(a_c.Citations, t.Title)>0
                         GROUP by a_c.Year""", (fname,lname,))
     result=cursor.fetchall()
@@ -282,25 +282,25 @@ def AuthorProfile(fname,lname, conn):
                     LIMIT 2""", (fname,lname,fname,lname,))
     result=cursor.fetchall()
     if(len(result)>0):
-        print(" Top 2 co-authors of {} {} and the number of their common publications.".format(fname,lname))
+        print(" Top co-authors of {} {} and the number of their common publications.".format(fname,lname))
         for i in range(len(result)):
             print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1], " ", result[i][2])
         
-            while(True):
-                co_author=int(input("If you want to view a co author's profile press the number next to him.\nElse press -1\n"))
-                match co_author:
-                    case 1:
-                        AuthorProfile(result[0][0], result[0][1], conn)
-                        return
-                        break
-                    case 2:
-                        AuthorProfile(result[1][0], result[1][1], conn)
-                        return
-                        break
-                    case -1:
-                        break
-                    case other:
-                        print("No match, type again.\n")
+        while(True):
+            co_author=int(input("If you want to view a co author's profile press the number next to him.\nElse press -1\n"))
+            match co_author:
+                case 1:
+                    AuthorProfile(result[0][0], result[0][1], conn)
+                    return
+                    break
+                case 2:
+                    AuthorProfile(result[1][0], result[1][1], conn)
+                    return
+                    break
+                case -1:
+                    break
+                case other:
+                    print("No match, type again.\n")
 
     while (True):
         publ=input("Do you want to show the author's ({} {}) articles and books?(Yes to show/No to go back)\n".format(fname,lname))
