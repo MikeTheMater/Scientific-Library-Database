@@ -10,9 +10,9 @@ if __name__=="__main__":
 
     print("Connected to SQLite")
 
-    match(fun):
-        case "Read":
-            library_db.makechoice(conn)
-        case "Upload":
+    if fun=="Read" or fun=="read":
+        library_db.makechoice(conn)
+    elif fun=="Upload" or fun=="upload":
             upload_file.uploadchoice(conn)
+
     conn.close()
