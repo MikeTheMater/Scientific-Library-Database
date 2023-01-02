@@ -38,7 +38,7 @@ def articleInfo(title, conn, name):
         match choice:
             case 1:
                 showAuthors(title, conn)
-                back=input("Do you want to return to Article's information?(Yes/No)(Default Yes)\n")
+                back=input("Do you want to return to Article's information?(Yes/No)\n")
                 if(back=="No"):
                     searchforAuthorAndTitles(name, conn)
                     break
@@ -50,7 +50,7 @@ def articleInfo(title, conn, name):
                     
             case 2:
                 showReferences(title, conn)
-                back=input("Do you want to return to Article's information?(Yes/No)(Default Yes)\n")
+                back=input("Do you want to return to Article's information?(Yes/No)\n")
                 if(back=="No"):
                     searchforAuthorAndTitles(name, conn)
                     break
@@ -62,7 +62,7 @@ def articleInfo(title, conn, name):
                     
             case 3:
                 showCitations(title, conn)
-                back=input("Do you want to return to Article's information?(Yes/No)(Default Yes)\n")
+                back=input("Do you want to return to Article's information?(Yes/No)\n")
                 if(back=="No"):
                     searchforAuthorAndTitles(name, conn)
                     break
@@ -74,7 +74,7 @@ def articleInfo(title, conn, name):
                     
             case 4:
                 showAbstract(title, conn)
-                back=input("Do you want to return to Article's information?(Yes/No)(Default Yes)\n")
+                back=input("Do you want to return to Article's information?(Yes/No)\n")
                 if(back=="No"):
                     searchforAuthorAndTitles(name, conn)
                     break
@@ -352,7 +352,7 @@ def searchforTitle(title, conn):
 
             if int(choice)>0 and int(choice)<=len(result):
                 if result[int(choice)-1][1]=="Article":
-                    articleInfo(result[int(choice)-1][0], conn, None)
+                    articleInfo(result[int(choice)-1][0], conn, )
                     break
                 elif result[int(choice)-1][1]=="Scientific Book":
                     bookInfo(result[int(choice)-1][0], conn)
@@ -378,24 +378,27 @@ def searchforKeyword(keyword, conn):
                     ORDER by a_k1.Keywords, c_k1.Keywords """, (f'%{keyword}%',f'%{keyword}%',))
     result=cursor.fetchall()
 
-    print("Keyword      Title")
-    for i in range(len(result)):
-        print("{} ".format(i+1),result[i][0], " ",result[i][1], " ", result[i][2])
+    if len(result)>0:
+        print("Keyword      Title")
+        for i in range(len(result)):
+            print("{} ".format(i+1),result[i][0], " ",result[i][1], " ", result[i][2])
 
-    while (True):
-        choice=input("If you want to select one publication press the number next to it.\n Else press -1 to go back.\n")
+        while (True):
+            choice=input("If you want to select one publication press the number next to it.\n Else press -1 to go back.\n")
 
-        if int(choice)>0 and int(choice)<=len(result):
-            if result[int(choice)-1][2]=="Article":
-                articleInfo(result[int(choice)-1][1], conn, "")
-                break
-            elif result[int(choice)-1][2]=="Chapter":
-                chapterInfo(result[int(choice)-1][1], conn)
-                break
-        elif choice=="-1":
-            return
-        else:
-            print("Wrong input, type again.")
+            if int(choice)>0 and int(choice)<=len(result):
+                if result[int(choice)-1][2]=="Article":
+                    articleInfo(result[int(choice)-1][1], conn, "")
+                    break
+                elif result[int(choice)-1][2]=="Chapter":
+                    chapterInfo(result[int(choice)-1][1], conn)
+                    break
+            elif choice=="-1":
+                return
+            else:
+                print("Wrong input, type again.")
+    else:
+        print("No match,  try again.\n")
 
 def chapterInfo(title, conn):
     cursor = conn.cursor()
@@ -404,7 +407,6 @@ def chapterInfo(title, conn):
                     FROM Chapter as ch, Scientific_Book as sb, (Publication as p join Composes as c on p.ID=c.PublicationID) join Author as a on a.ID=c.AuthorID, Publisher
                     WHERE ch.Title=? and ch.BookID=sb.ID AND p.ID=sb.ID and sb.PublisherID=Publisher.ID""", (title,))
     result=cursor.fetchall()
-    print(result)
     print("The chapter {} is part of: {}\n".format(result[0][0], result[0][3]))
     print("DOI:{}".format(result[0][1]))
     print("Publisher:{}".format(result[0][6]))
@@ -420,7 +422,7 @@ def chapterInfo(title, conn):
     
     
     while(True):
-        auth=input("Do you want to show abstract's authors?(Yes/No)")
+        auth=input("Do you want to show chapter's authors?(Yes/No)\n")
         if auth=="Yes": 
             for i in range(len(result)):
                 print("{} ".format(i+1),result[i][4], result[i][5])
@@ -432,6 +434,7 @@ def chapterInfo(title, conn):
                     break
                 else:
                     print("Wrong input, type again")    
+                break
             break
         elif auth=="No": 
             break
