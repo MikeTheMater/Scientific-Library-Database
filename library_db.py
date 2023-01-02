@@ -259,6 +259,18 @@ def AuthorProfile(fname,lname, conn):
     for i in range(len(result)):
         print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1])
     
+    cursor.execute("""SELECT a_c.Year, count(*) as "Citations per Year"
+                        FROM Article_Citations as a_c JOIN (SELECT p.Title
+                                                            FROM (Author as a JOIN Composes as c on a.ID= c.AuthorID) JOIN Publication as p on c.PublicationID= p.ID
+                                                            WHERE a.FirstName= "Weixing" AND a.LastName= "Ji") as t
+                        WHERE instr(a_c.Citations, t.Title)>0
+                        GROUP by a_c.Year""", (fname,lname,))
+    result=cursor.fetchall()
+    
+    print(" Number of citaitons for {} {} each year.".format(fname,lname))
+    for i in range(len(result)):
+        print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1])
+
     cursor.execute("""SELECT  a.FirstName ,a.LastName, count(*) as "Number of Collaborations"
                     FROM Author as a JOIN Composes as c on a.ID= c.AuthorID
                     WHERE c.PublicationID in ( SELECT DISTINCT c.PublicationID
