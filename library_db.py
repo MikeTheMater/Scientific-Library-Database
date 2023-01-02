@@ -357,7 +357,7 @@ def searchforTitle(title, conn):
                     FROM Publication as p JOIN Article as a on p.ID= a.ID
                     WHERE p.Title like :title
                     UNION
-                    SELECT p.Title, "Scientific_Book"
+                    SELECT p.Title, "Scientific Book"
                     FROM Publication as p JOIN Scientific_Book as sb on p.ID= sb.ID
                     WHERE p.Title like :title
                     ORDER by p.Title ''', (f'%{title}%',))
@@ -365,7 +365,7 @@ def searchforTitle(title, conn):
     if(len(result)>0):
         print("Titles")
         for i in range(len(result)):
-            print("{} ".format(i+1), result[i][0])
+            print("{} ".format(i+1), result[i][0], result[i][1])
         choice=int(input("If you want to show more information about one Publication press the number next to it.\nElse press -1 to get back.\n"))
 
         while (True):
@@ -375,7 +375,7 @@ def searchforTitle(title, conn):
                 if result[int(choice)-1][1]=="Article":
                     articleInfo(result[int(choice)-1][0], conn)
                     break
-                elif result[int(choice)-1][1]=="Scientific_Book":
+                elif result[int(choice)-1][1]=="Scientific Book":
                     bookInfo(result[int(choice)-1][0], conn)
                     break
             elif choice=="-1":
