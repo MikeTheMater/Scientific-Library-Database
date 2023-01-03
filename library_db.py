@@ -51,52 +51,56 @@ def articleInfo(title, conn, name):
         match choice:
             case "1":
                 showAuthors(title, conn)
-                back=input("Do you want to return to Article's information?(Yes/No)\n")
-                if(back=="No"):
-                    searchforAuthorAndTitles(name, conn)
-                    break
-                elif (back=="Yes"):
-                    articleInfo(title, conn, name)
-                    break
-                else:
-                    print("Wrong in typing.\n")
-                    
+                while(True):
+                    back=input("Do you want to return to Article's information?(Yes/No)\n")
+                    if(back=="No"):
+                        searchforAuthorAndTitles(name, conn)
+                        break
+                    elif (back=="Yes"):
+                        articleInfo(title, conn, name)
+                        break
+                    else:
+                        print("Wrong in typing.\n")
+                break
             case "2":
                 showReferences(title, conn)
-                back=input("Do you want to return to Article's information?(Yes/No)\n")
-                if(back=="No"):
-                    searchforAuthorAndTitles(name, conn)
-                    break
-                elif (back=="Yes"):
-                    articleInfo(title, conn, name)
-                    break
-                else:
-                    print("Wrong in typing.\n")
-                    
+                while(True):
+                    back=input("Do you want to return to Article's information?(Yes/No)\n")
+                    if(back=="No"):
+                        searchforAuthorAndTitles(name, conn)
+                        break
+                    elif (back=="Yes"):
+                        articleInfo(title, conn, name)
+                        break
+                    else:
+                        print("Wrong in typing.\n")
+                break
             case "3":
                 showCitations(title, conn)
-                back=input("Do you want to return to Article's information?(Yes/No)\n")
-                if(back=="No"):
-                    searchforAuthorAndTitles(name, conn)
-                    break
-                elif (back=="Yes"):
-                    articleInfo(title, conn, name)
-                    break
-                else:
-                    print("Wrong in typing.\n")
-                    
+                while(True):
+                    back=input("Do you want to return to Article's information?(Yes/No)\n")
+                    if(back=="No"):
+                        searchforAuthorAndTitles(name, conn)
+                        break
+                    elif (back=="Yes"):
+                        articleInfo(title, conn, name)
+                        break
+                    else:
+                        print("Wrong in typing.\n")
+                break
             case "4":
                 showAbstract(title, conn)
-                back=input("Do you want to return to Article's information?(Yes/No)\n")
-                if(back=="No"):
-                    searchforAuthorAndTitles(name, conn)
-                    break
-                elif (back=="Yes"):
-                    articleInfo(title, conn, name)
-                    break
-                else:
-                    print("Wrong in typing.\n")
-                    
+                while(True):
+                    back=input("Do you want to return to Article's information?(Yes/No)\n")
+                    if(back=="No"):
+                        searchforAuthorAndTitles(name, conn)
+                        break
+                    elif (back=="Yes"):
+                        articleInfo(title, conn, name)
+                        break
+                    else:
+                        print("Wrong in typing.\n")
+                break
             case "-1":
                 searchforAuthorAndTitles(name, conn)
                 break
@@ -115,46 +119,46 @@ def bookInfo(title, conn, name):
         print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1],"  ", result[i][2],"  " ,result[i][3],"  ", result[i][4],"  ", result[i][5], " ", result[i][6] )
     
     while(True):
-        choice=int(input("Press 1 to show the Authors \nPress 2 to show Abstract \nPress 3 to show Chapters \nPress -1 to exit\n"))
+        choice=input("Press 1 to show the Authors \nPress 2 to show Abstract \nPress 3 to show Chapters \nPress -1 to exit\n")
         
         match choice:
-            case 1:
+            case "1":
                 showAuthors(title, conn)
                 back=input("Do you want to return to Book's information?(Yes/No)\n")
-                if(back=="No"):
+                if(back.lower()=="no"):
                     #searchforAuthorAndTitles(name, conn)
                     break
-                elif (back=="Yes"):
+                elif (back.lower()=="yes"):
                     bookInfo(title, conn, name)
                     break
                 else:
                     print("Wrong in typing.\n")
                     
-            case 2:
+            case "2":
                 showAbstract(title, conn)
                 back=input("Do you want to return to Book's information?(Yes/No)\n")
-                if(back=="No"):
+                if(back.lower()=="no"):
                     #searchforAuthorAndTitles(name, conn)
                     break
-                elif (back=="Yes"):
+                elif (back.lower()=="yes"):
                     bookInfo(title, conn, name)
                     break
                 else:
                     print("Wrong in typing.\n")
                     
-            case 3:
+            case "3":
                 showChapters(title, conn)
                 back=input("Do you want to return to Book's information?(Yes/No)\n")
-                if(back=="No"):
+                if(back.lower()=="no"):
                     #searchforAuthorAndTitles(name, conn)
                     break
-                elif (back=="Yes"):
+                elif (back.lower()=="yes"):
                     bookInfo(title, conn, name)
                     break
                 else:
                     print("Wrong in typing.\n")
                     
-            case -1:
+            case "-1":
                 break
                 #searchforAuthorAndTitles(name, conn)
 
@@ -302,12 +306,12 @@ def AuthorProfile(fname,lname, conn):
 
     while (True):
         publ=input("Do you want to show the author's ({} {}) articles and books?(Yes to show/No to go back)\n".format(fname,lname))
-        match publ:
-            case "Yes":
+        match publ.lower():
+            case "yes":
                 searchforAuthorAndTitles([fname,lname], conn)
                 
                 break
-            case "No":
+            case "no":
                 break
             case other:
                 print("Wrong input, type again.\n")
@@ -453,10 +457,10 @@ def chapterInfo(title, conn):
     print("Publisher:{}".format(result[0][6]))
     while(True):
         abstr=input("Do you want to show Chapter's Abstract?(Yes/No)\n")
-        if abstr=="Yes": 
+        if abstr.lower()=="Yes": 
             print(result[0][2])
             break
-        elif abstr=="No": 
+        elif abstr.lower()=="No": 
             break
         else:
             print("Wrong input, type again")
@@ -490,18 +494,18 @@ def makechoice(conn):
             case "1":
                 while(True):
                     name=input("Type the author you are looking for. Or type <<back>> to go back\n")
-                    if name=="back": break
+                    if name.lower()=="back": break
                     searchforAuthor(name, conn)
 
             case "2":
                 while(True):
                     title=input("Type the Title you are looking for. Or type <<back>> to go back\n")
-                    if title=="back": break
+                    if title.lower()=="back": break
                     searchforTitle(title, conn)
             case "3":
                 while(True):
                     keyword=input("Type the keyword you are looking for. Or type <<back>> to go back\n")
-                    if keyword=="back": break
+                    if keyword.lower()=="back": break
                     searchforKeyword(keyword, conn)
             case "-1":break
             case other:
