@@ -114,7 +114,7 @@ def bookInfo(title, conn, name):
                 showAuthors(title, conn)
                 back=input("Do you want to return to Book's information?(Yes/No)\n")
                 if(back=="No"):
-                    searchforAuthorAndTitles(name, conn)
+                    #searchforAuthorAndTitles(name, conn)
                     break
                 elif (back=="Yes"):
                     bookInfo(title, conn, name)
@@ -126,7 +126,7 @@ def bookInfo(title, conn, name):
                 showAbstract(title, conn)
                 back=input("Do you want to return to Book's information?(Yes/No)\n")
                 if(back=="No"):
-                    searchforAuthorAndTitles(name, conn)
+                    #searchforAuthorAndTitles(name, conn)
                     break
                 elif (back=="Yes"):
                     bookInfo(title, conn, name)
@@ -138,7 +138,7 @@ def bookInfo(title, conn, name):
                 showChapters(title, conn)
                 back=input("Do you want to return to Book's information?(Yes/No)\n")
                 if(back=="No"):
-                    searchforAuthorAndTitles(name, conn)
+                    #searchforAuthorAndTitles(name, conn)
                     break
                 elif (back=="Yes"):
                     bookInfo(title, conn, name)
@@ -147,7 +147,8 @@ def bookInfo(title, conn, name):
                     print("Wrong in typing.\n")
                     
             case -1:
-                searchforAuthorAndTitles(name, conn)
+                break
+                #searchforAuthorAndTitles(name, conn)
 
 def showChapters(title, conn):
     cursor = conn.cursor()
@@ -165,7 +166,7 @@ def showChapters(title, conn):
         chapter=input("If you want to see more about a chapter press the number next to it,\n or press -1 to go back.\n")
         if chapter.isnumeric()==False:print("Wrong insertion type again.\n")
         elif int(chapter)>0 and int(chapter)<len(result): 
-            chapterInfo(result[int(chapter)-1][0],result[int(chapter)-1][1], conn)
+            chapterInfo(result[int(chapter)-1][0], conn)
             break
         elif chapter=="-1":
             break
@@ -216,8 +217,6 @@ def showAuthors(title, conn):
     print("   First Name     Last Name      Affiliation")
     for i in range(len(result)):
         print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1],"  ", result[i][2])
-
-    print("Do you want to go to an Author's profile?")
 
     while(True):
         author=input("If you want to visit an author's profile press the number next to him,\n or press -1 to go back.\n")
@@ -318,7 +317,9 @@ def searchforAuthor(name, conn):
                 print("{} ".format(i+1),result[i][0], " ",result[i][1])
             author=int(input("If you want to show more information about one Author press the number next to him to go to his profile \nElse press -1 to get back\n"))
             if author==-1: return
-            else:  AuthorProfile(result[author-1][0],result[author-1][1], conn)
+
+            else:#go to author's profile  
+                AuthorProfile(result[author-1][0],result[author-1][1], conn)
         else: print("No match")
     elif len(name)==2:
         # Creating cursor object using connection object
@@ -333,7 +334,8 @@ def searchforAuthor(name, conn):
                 print("{} ".format(i+1),result[i][0], " ",result[i][1])
             author=int(input("If you want to show more information about one Author press the number next to him to go to his profile \nElse press -1 to get back\n"))
             if author==-1: return
-            else:AuthorProfile(result[author-1][0],result[author-1][1], conn)
+            else:#go to author's profile
+                AuthorProfile(result[author-1][0],result[author-1][1], conn)
         else: print("No match")
     
 
@@ -360,10 +362,11 @@ def searchforTitle(title, conn):
             if int(choice)>0 and int(choice)<=len(result):
                 name=findTitlesAuthor(conn, result[int(choice)-1][0])
                 if result[int(choice)-1][1]=="Article":
-                    
+                    #call article info to show more informations about the article
                     articleInfo(result[int(choice)-1][0], conn, name)
                     break
                 elif result[int(choice)-1][1]=="Scientific Book":
+                    #call bookInfo to show more informations about the book
                     bookInfo(result[int(choice)-1][0], conn, name)
                     break
             elif choice=="-1":
