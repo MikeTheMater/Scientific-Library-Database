@@ -1,7 +1,7 @@
 import sqlite3
 
 #search for the publication titles that an author has writen
-def searchforAuthorAndTitles(name, conn):
+def searchforAuthorAndTitles(name, conn, flag):
     # Creating cursor object using connection object
     cursor = conn.cursor()
     # executing our sql query
@@ -50,12 +50,12 @@ def articleInfo(title, conn, name, flag):
         
         match choice:
             case "1":
-                showAuthors(title, conn)
+                showAuthors(title, conn, flag)
                 while(True):
                     back=input("Do you want to return to Article's information?(Yes/No)\n")
                     if(back=="No"):
                         if flag==True:
-                            searchforAuthorAndTitles(name, conn)
+                            searchforAuthorAndTitles(name, conn, flag)
                         elif flag==False:
                             makechoice(conn) 
                         break
@@ -71,7 +71,7 @@ def articleInfo(title, conn, name, flag):
                     back=input("Do you want to return to Article's information?(Yes/No)\n")
                     if(back=="No"):
                         if flag==True:
-                            searchforAuthorAndTitles(name, conn)
+                            searchforAuthorAndTitles(name, conn, flag)
                         elif flag==False:
                             makechoice(conn) 
                         break
@@ -87,7 +87,7 @@ def articleInfo(title, conn, name, flag):
                     back=input("Do you want to return to Article's information?(Yes/No)\n")
                     if(back=="No"):
                         if flag==True:
-                            searchforAuthorAndTitles(name, conn)
+                            searchforAuthorAndTitles(name, conn, flag)
                         elif flag==False:
                             makechoice(conn) 
                         break
@@ -103,7 +103,7 @@ def articleInfo(title, conn, name, flag):
                     back=input("Do you want to return to Article's information?(Yes/No)\n")
                     if(back=="No"):
                         if flag==True:
-                            searchforAuthorAndTitles(name, conn)
+                            searchforAuthorAndTitles(name, conn, flag)
                         elif flag==False:
                             makechoice(conn) 
                         break
@@ -114,12 +114,12 @@ def articleInfo(title, conn, name, flag):
                         print("Wrong in typing.\n")
                 break
             case "-1":
-                searchforAuthorAndTitles(name, conn)
+                searchforAuthorAndTitles(name, conn, flag)
                 break
             case other:
                 print("No match, try again.\n")
 
-def bookInfo(title, conn, name):
+def bookInfo(title, conn, name, flag):
     cursor = conn.cursor()
     # executing our sql query
     cursor.execute("""SELECT Distinct p.Title , sb.[Book Type], sb.[Persistent Link], sb.[Electronic pdf ISBN], sb.[Electronic epub ISBN], sb.[Online ISBN], sb.[Print ISBN]
@@ -135,7 +135,7 @@ def bookInfo(title, conn, name):
         
         match choice:
             case "1":
-                showAuthors(title, conn)
+                showAuthors(title, conn, flag)
                 back=input("Do you want to return to Book's information?(Yes/No)\n")
                 if(back.lower()=="no"):
                     #searchforAuthorAndTitles(name, conn)
@@ -159,7 +159,7 @@ def bookInfo(title, conn, name):
                     print("Wrong in typing.\n")
                     
             case "3":
-                showChapters(title, conn)
+                showChapters(title, conn, flag)
                 back=input("Do you want to return to Book's information?(Yes/No)\n")
                 if(back.lower()=="no"):
                     #searchforAuthorAndTitles(name, conn)
@@ -174,7 +174,7 @@ def bookInfo(title, conn, name):
                 break
                 #searchforAuthorAndTitles(name, conn)
 
-def showChapters(title, conn):
+def showChapters(title, conn, flag):
     cursor = conn.cursor()
     # executing our sql query
     print(title)
@@ -190,7 +190,7 @@ def showChapters(title, conn):
         chapter=input("If you want to see more about a chapter press the number next to it,\n or press -1 to go back.\n")
         if chapter.isnumeric()==False:print("Wrong insertion type again.\n")
         elif int(chapter)>0 and int(chapter)<len(result): 
-            chapterInfo(result[int(chapter)-1][0], conn)
+            chapterInfo(result[int(chapter)-1][0], conn, flag)
             break
         elif chapter=="-1":
             break
@@ -229,7 +229,7 @@ def showReferences(title, conn):
         print("{} ".format(i+1),"  " ,result[i][0])
 
 #search for the authors of the publication and their affiliation
-def showAuthors(title, conn):
+def showAuthors(title, conn, flag):
     cursor = conn.cursor()
     # executing our sql query
     print(title)
@@ -246,7 +246,7 @@ def showAuthors(title, conn):
         author=input("If you want to visit an author's profile press the number next to him,\n or press -1 to go back.\n")
         if author.isdigit():
             if int(author)>0 and int(author)<=len(result): 
-                AuthorProfile(result[int(author)-1][0],result[int(author)-1][1], conn)
+                AuthorProfile(result[int(author)-1][0],result[int(author)-1][1], conn, flag)
                 break
             
             else:print("Wrong insertion type again.\n")
@@ -255,7 +255,7 @@ def showAuthors(title, conn):
         else:print("Wrong insertion type again.\n")
 
 
-def AuthorProfile(fname,lname, conn):
+def AuthorProfile(fname,lname, conn, flag):
     cursor = conn.cursor()
     # executing our sql query
     print(fname,lname)
@@ -303,11 +303,11 @@ def AuthorProfile(fname,lname, conn):
             co_author=input("If you want to view a co author's profile press the number next to him.\nElse press -1\n")
             match co_author:
                 case "1":
-                    AuthorProfile(result[0][0], result[0][1], conn)
+                    AuthorProfile(result[0][0], result[0][1], conn, flag)
                     return
                     break
                 case "2":
-                    AuthorProfile(result[1][0], result[1][1], conn)
+                    AuthorProfile(result[1][0], result[1][1], conn, flag)
                     return
                     break
                 case "-1":
@@ -320,7 +320,7 @@ def AuthorProfile(fname,lname, conn):
         publ=input("Do you want to show the author's ({} {}) articles and books?(Yes to show/No to go back)\n".format(fname,lname))
         match publ.lower():
             case "yes":
-                searchforAuthorAndTitles([fname,lname], conn)
+                searchforAuthorAndTitles([fname,lname], conn, flag)
                 
                 break
             case "no":
@@ -349,7 +349,7 @@ def searchforAuthor(name, conn, flag):
                 if author.isdigit():
                     if int(author)<=len(result) and int(author)>0: 
                         #go to author's profile  
-                        AuthorProfile(result[author-1][0],result[author-1][1], conn)
+                        AuthorProfile(result[author-1][0],result[author-1][1], conn, flag)
                     else:
                         print("Wrong input, try again.\n")
                 elif author=="-1": return
@@ -369,7 +369,7 @@ def searchforAuthor(name, conn, flag):
             author=int(input("If you want to show more information about one Author press the number next to him to go to his profile \nElse press -1 to get back\n"))
             if author==-1: return
             else:#go to author's profile
-                AuthorProfile(result[author-1][0],result[author-1][1], conn)
+                AuthorProfile(result[author-1][0],result[author-1][1], conn, flag)
         else: print("No match")
     
 
@@ -445,10 +445,10 @@ def searchforKeyword(keyword, conn, flag):
             if int(choice)>0 and int(choice)<=len(result):
                 if result[int(choice)-1][2]=="Article":
                     name=findTitlesAuthor(conn,result[int(choice)-1][1])
-                    articleInfo(result[int(choice)-1][1], conn, name)
+                    articleInfo(result[int(choice)-1][1], conn, name, flag)
                     break
                 elif result[int(choice)-1][2]=="Chapter":
-                    chapterInfo(result[int(choice)-1][1], conn)
+                    chapterInfo(result[int(choice)-1][1], conn, flag)
                     break
             elif choice=="-1":
                 return
@@ -457,7 +457,7 @@ def searchforKeyword(keyword, conn, flag):
     else:
         print("No match,  try again.\n")
 
-def chapterInfo(title, conn):
+def chapterInfo(title, conn, flag):
     cursor = conn.cursor()
     # executing our sql query
     cursor.execute("""SELECT Distinct ch.Title , ch.DOI , ch.Abstract, p.Title, a.FirstName, a.LastName, Publisher.Name
@@ -486,7 +486,7 @@ def chapterInfo(title, conn):
             while(True):
                 pr=input("If you want to show an author's profile press the number next to him.\n Else press -1.\n")
                 if int(pr)>0 and int(pr)<=len(result):
-                    AuthorProfile(result[int(pr)-1][4], result[int(pr)-1][5], conn)
+                    AuthorProfile(result[int(pr)-1][4], result[int(pr)-1][5], conn, flag)
                 elif pr=="-1": 
                     break
                 else:
