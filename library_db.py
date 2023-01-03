@@ -21,16 +21,20 @@ def searchforAuthorAndTitles(name, conn, flag):
         choice=input("If you want to show more information about one Publication press the number next to its title \nElse press -1 to get back\n")
         if choice.isdigit():
             if int(choice)<=len(result) and int(choice)>0: 
-                if result[choice-1][1]=="Article":
+                if result[int(choice)-1][1]=="Article":
                     articleInfo(result[int(choice)-1][0], conn, name, flag)
-                elif result[choice-1][1]=="Scientific Book":
-                    bookInfo(result[int(choice)-1][0], conn, name)
+                    return
+                elif result[int(choice)-1][1]=="Scientific Book":
+                    bookInfo(result[int(choice)-1][0], conn, name, flag)
+                    return
                 return
             
             else:
                 print("Wrong input, try again.\n")
-        elif choice=="-1": return
-        else:print("Wrong input, try again.\n")
+        elif choice=="-1": 
+            return
+        else:
+            print("Wrong input, try again.\n")
     
 
 #search for information on the publication with the given title
@@ -53,13 +57,13 @@ def articleInfo(title, conn, name, flag):
                 showAuthors(title, conn, flag)
                 while(True):
                     back=input("Do you want to return to Article's information?(Yes/No)\n")
-                    if(back=="No"):
+                    if(back.lower()=="no"):
                         if flag==True:
                             searchforAuthorAndTitles(name, conn, flag)
                         elif flag==False:
-                            makechoice(conn) 
+                            return 
                         break
-                    elif (back=="Yes"):
+                    elif (back=="nes"):
                         articleInfo(title, conn, name, flag)
                         break
                     else:
@@ -69,13 +73,13 @@ def articleInfo(title, conn, name, flag):
                 showReferences(title, conn)
                 while(True):
                     back=input("Do you want to return to Article's information?(Yes/No)\n")
-                    if(back=="No"):
+                    if(back.lower()=="no"):
                         if flag==True:
                             searchforAuthorAndTitles(name, conn, flag)
                         elif flag==False:
-                            makechoice(conn) 
+                            return
                         break
-                    elif (back=="Yes"):
+                    elif (back=="nes"):
                         articleInfo(title, conn, name, flag)
                         break
                     else:
@@ -85,13 +89,13 @@ def articleInfo(title, conn, name, flag):
                 showCitations(title, conn)
                 while(True):
                     back=input("Do you want to return to Article's information?(Yes/No)\n")
-                    if(back=="No"):
+                    if(back.lower()=="no"):
                         if flag==True:
                             searchforAuthorAndTitles(name, conn, flag)
                         elif flag==False:
-                            makechoice(conn) 
+                            return
                         break
-                    elif (back=="Yes"):
+                    elif (back.lower()=="yes"):
                         articleInfo(title, conn, name, flag)
                         break
                     else:
@@ -101,13 +105,13 @@ def articleInfo(title, conn, name, flag):
                 showAbstract(title, conn)
                 while(True):
                     back=input("Do you want to return to Article's information?(Yes/No)\n")
-                    if(back=="No"):
+                    if(back.lower()=="no"):
                         if flag==True:
                             searchforAuthorAndTitles(name, conn, flag)
                         elif flag==False:
-                            makechoice(conn) 
+                            return
                         break
-                    elif (back=="Yes"):
+                    elif (back.lower()=="yes"):
                         articleInfo(title, conn, name, flag)
                         break
                     else:
@@ -136,39 +140,42 @@ def bookInfo(title, conn, name, flag):
         match choice:
             case "1":
                 showAuthors(title, conn, flag)
-                back=input("Do you want to return to Book's information?(Yes/No)\n")
-                if(back.lower()=="no"):
-                    #searchforAuthorAndTitles(name, conn)
-                    break
-                elif (back.lower()=="yes"):
-                    bookInfo(title, conn, name)
-                    break
-                else:
-                    print("Wrong in typing.\n")
+                while(True):
+                    back=input("Do you want to return to Book's information?(Yes/No)\n")
+                    if(back.lower()=="no"):
+                        #searchforAuthorAndTitles(name, conn)
+                        return
+                    elif (back.lower()=="yes"):
+                        bookInfo(title, conn, name, flag)
+                        return
+                    else:
+                        print("Wrong in typing.\n")
                     
             case "2":
                 showAbstract(title, conn)
-                back=input("Do you want to return to Book's information?(Yes/No)\n")
-                if(back.lower()=="no"):
-                    #searchforAuthorAndTitles(name, conn)
-                    break
-                elif (back.lower()=="yes"):
-                    bookInfo(title, conn, name)
-                    break
-                else:
-                    print("Wrong in typing.\n")
+                while(True):
+                    back=input("Do you want to return to Book's information?(Yes/No)\n")
+                    if(back.lower()=="no"):
+                        #searchforAuthorAndTitles(name, conn)
+                        return
+                    elif (back.lower()=="yes"):
+                        bookInfo(title, conn, name, flag)
+                        return
+                    else:
+                        print("Wrong in typing.\n")
                     
             case "3":
                 showChapters(title, conn, flag)
-                back=input("Do you want to return to Book's information?(Yes/No)\n")
-                if(back.lower()=="no"):
-                    #searchforAuthorAndTitles(name, conn)
-                    break
-                elif (back.lower()=="yes"):
-                    bookInfo(title, conn, name)
-                    break
-                else:
-                    print("Wrong in typing.\n")
+                while(True):
+                    back=input("Do you want to return to Book's information?(Yes/No)\n")
+                    if(back.lower()=="no"):
+                        #searchforAuthorAndTitles(name, conn)
+                        return
+                    elif (back.lower()=="yes"):
+                        bookInfo(title, conn, name, flag)
+                        return
+                    else:
+                        print("Wrong in typing.\n")
                     
             case "-1":
                 break
@@ -177,7 +184,6 @@ def bookInfo(title, conn, name, flag):
 def showChapters(title, conn, flag):
     cursor = conn.cursor()
     # executing our sql query
-    print(title)
     cursor.execute("""SELECT ch.Title
             FROM (Chapter as ch join Scientific_Book as sb on ch.BookID=sb.ID) join Publication as p on p.ID=sb.ID
             WHERE p.Title=?""", (title,))
@@ -188,12 +194,17 @@ def showChapters(title, conn, flag):
 
     while(True):
         chapter=input("If you want to see more about a chapter press the number next to it,\n or press -1 to go back.\n")
-        if chapter.isnumeric()==False:print("Wrong insertion type again.\n")
-        elif int(chapter)>0 and int(chapter)<len(result): 
-            chapterInfo(result[int(chapter)-1][0], conn, flag)
-            break
+        if chapter.isnumeric():
+            if int(chapter)>0 and int(chapter)<len(result): 
+                chapterInfo(result[int(chapter)-1][0], conn, flag)
+                break
+            else:
+                print("Wrong insertion type again.\n")
+
         elif chapter=="-1":
-            break
+                break
+        else:
+            print("Wrong insertion type again.\n")
 
 def showAbstract(title, conn):
     cursor = conn.cursor()
@@ -349,9 +360,11 @@ def searchforAuthor(name, conn, flag):
                 if author.isdigit():
                     if int(author)<=len(result) and int(author)>0: 
                         #go to author's profile  
-                        AuthorProfile(result[author-1][0],result[author-1][1], conn, flag)
+                        AuthorProfile(result[int(author)-1][0],result[int(author)-1][1], conn, flag)
+                        return
                     else:
                         print("Wrong input, try again.\n")
+                    
                 elif author=="-1": return
                 else:print("Wrong input, try again.\n")
         else: print("No match")
@@ -401,8 +414,8 @@ def searchforTitle(title, conn, flag):
                     break
                 elif result[int(choice)-1][1]=="Scientific Book":
                     #call bookInfo to show more informations about the book
-                    bookInfo(result[int(choice)-1][0], conn, name)
-                    break
+                    bookInfo(result[int(choice)-1][0], conn, name,flag)
+                    return
             elif choice=="-1":
                 return
             else:
@@ -442,14 +455,15 @@ def searchforKeyword(keyword, conn, flag):
         while (True):
             choice=input("If you want to select one publication press the number next to it.\n Else press -1 to go back.\n")
 
-            if int(choice)>0 and int(choice)<=len(result):
-                if result[int(choice)-1][2]=="Article":
-                    name=findTitlesAuthor(conn,result[int(choice)-1][1])
-                    articleInfo(result[int(choice)-1][1], conn, name, flag)
-                    break
-                elif result[int(choice)-1][2]=="Chapter":
-                    chapterInfo(result[int(choice)-1][1], conn, flag)
-                    break
+            if choice.isnumeric():
+                if int(choice)>0 and int(choice)<=len(result):
+                    if result[int(choice)-1][2]=="Article":
+                        name=findTitlesAuthor(conn,result[int(choice)-1][1])
+                        articleInfo(result[int(choice)-1][1], conn, name, flag)
+                        break
+                    elif result[int(choice)-1][2]=="Chapter":
+                        chapterInfo(result[int(choice)-1][1], conn, flag)
+                        break
             elif choice=="-1":
                 return
             else:
@@ -469,18 +483,18 @@ def chapterInfo(title, conn, flag):
     print("Publisher:{}".format(result[0][6]))
     while(True):
         abstr=input("Do you want to show Chapter's Abstract?(Yes/No)\n")
-        if abstr.lower()=="Yes": 
+        if abstr.lower()=="yes": 
             print(result[0][2])
             break
-        elif abstr.lower()=="No": 
+        elif abstr.lower()=="no": 
             break
         else:
             print("Wrong input, type again")
     
     
     while(True):
-        auth=input("Do you want to show chapter's authors?(Yes/No)\n")
-        if auth=="Yes": 
+        auth=input("Do you want to show Chapter's Authors?(Yes/No)\n")
+        if auth.lower()=="yes": 
             for i in range(len(result)):
                 print("{} ".format(i+1),result[i][4], result[i][5])
             while(True):
@@ -493,7 +507,7 @@ def chapterInfo(title, conn, flag):
                     print("Wrong input, type again")    
                 break
             break
-        elif auth=="No": 
+        elif auth.lower()=="no": 
             break
         else:
             print("Wrong input, type again")
