@@ -16,15 +16,21 @@ def searchforAuthorAndTitles(name, conn):
     print("Showing Publications of Author {} {}\n   Title".format(name[0],name[1]))
     for i in range(len(result)):
         print("{} ".format(i+1), result[i][0],"   ", result[i][1])
- 
-    choice=int(input("If you want to show more information about one Publication press the number next to its title \nElse press -1 to get back\n"))
-    if choice<=len(result) and choice>0: 
-        if result[choice-1][1]=="Article":
-            articleInfo(result[choice-1][0], conn, name)
-        elif result[choice-1][1]=="Scientific Book":
-            bookInfo(result[choice-1][0], conn, name)
-        return
-    elif choice==-1: return
+    
+    while(True):
+        choice=input("If you want to show more information about one Publication press the number next to its title \nElse press -1 to get back\n")
+        if choice.isdigit():
+            if int(choice)<=len(result) and int(choice)>0: 
+                if result[choice-1][1]=="Article":
+                    articleInfo(result[int(choice)-1][0], conn, name)
+                elif result[choice-1][1]=="Scientific Book":
+                    bookInfo(result[int(choice)-1][0], conn, name)
+                return
+            
+            else:
+                print("Wrong input, try again.\n")
+        elif choice=="-1": return
+        else:print("Wrong input, try again.\n")
     
 
 #search for information on the publication with the given title
@@ -40,10 +46,10 @@ def articleInfo(title, conn, name):
         print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1],"  ", result[i][2],"  " ,result[i][3],"  ", result[i][4],"  ", result[i][5], " ", result[i][6] )
     
     while(True):
-        choice=int(input("Press 1 to show the Authors \nPress 2 to show References \nPress 3 to show Citations \nPress 4 to show Abstract \nPress -1 to exit\n"))
+        choice=input("Press 1 to show the Authors \nPress 2 to show References \nPress 3 to show Citations \nPress 4 to show Abstract \nPress -1 to exit\n")
         
         match choice:
-            case 1:
+            case "1":
                 showAuthors(title, conn)
                 back=input("Do you want to return to Article's information?(Yes/No)\n")
                 if(back=="No"):
@@ -55,7 +61,7 @@ def articleInfo(title, conn, name):
                 else:
                     print("Wrong in typing.\n")
                     
-            case 2:
+            case "2":
                 showReferences(title, conn)
                 back=input("Do you want to return to Article's information?(Yes/No)\n")
                 if(back=="No"):
@@ -67,7 +73,7 @@ def articleInfo(title, conn, name):
                 else:
                     print("Wrong in typing.\n")
                     
-            case 3:
+            case "3":
                 showCitations(title, conn)
                 back=input("Do you want to return to Article's information?(Yes/No)\n")
                 if(back=="No"):
@@ -79,7 +85,7 @@ def articleInfo(title, conn, name):
                 else:
                     print("Wrong in typing.\n")
                     
-            case 4:
+            case "4":
                 showAbstract(title, conn)
                 back=input("Do you want to return to Article's information?(Yes/No)\n")
                 if(back=="No"):
@@ -91,9 +97,11 @@ def articleInfo(title, conn, name):
                 else:
                     print("Wrong in typing.\n")
                     
-            case -1:
+            case "-1":
                 searchforAuthorAndTitles(name, conn)
                 break
+            case other:
+                print("No match, try again.\n")
 
 def bookInfo(title, conn, name):
     cursor = conn.cursor()
@@ -220,11 +228,14 @@ def showAuthors(title, conn):
 
     while(True):
         author=input("If you want to visit an author's profile press the number next to him,\n or press -1 to go back.\n")
-        if int(author)>0 and int(author)<len(result): 
-            AuthorProfile(result[int(author)-1][0],result[int(author)-1][1], conn)
-            break
+        if author.isdigit():
+            if int(author)>0 and int(author)<=len(result): 
+                AuthorProfile(result[int(author)-1][0],result[int(author)-1][1], conn)
+                break
+            
+            else:print("Wrong insertion type again.\n")
         elif author=="-1":
-            break
+                break
         else:print("Wrong insertion type again.\n")
 
 
@@ -273,20 +284,21 @@ def AuthorProfile(fname,lname, conn):
             print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1], " ", result[i][2])
         
         while(True):
-            co_author=int(input("If you want to view a co author's profile press the number next to him.\nElse press -1\n"))
+            co_author=input("If you want to view a co author's profile press the number next to him.\nElse press -1\n")
             match co_author:
-                case 1:
+                case "1":
                     AuthorProfile(result[0][0], result[0][1], conn)
                     return
                     break
-                case 2:
+                case "2":
                     AuthorProfile(result[1][0], result[1][1], conn)
                     return
                     break
-                case -1:
+                case "-1":
                     break
                 case other:
                     print("No match, type again.\n")
+    else: print("{} {} doesn't have co-authors.".format(fname,lname))
 
     while (True):
         publ=input("Do you want to show the author's ({} {}) articles and books?(Yes to show/No to go back)\n".format(fname,lname))
@@ -315,11 +327,17 @@ def searchforAuthor(name, conn):
             for i in range(len(result)):
                 
                 print("{} ".format(i+1),result[i][0], " ",result[i][1])
-            author=int(input("If you want to show more information about one Author press the number next to him to go to his profile \nElse press -1 to get back\n"))
-            if author==-1: return
 
-            else:#go to author's profile  
-                AuthorProfile(result[author-1][0],result[author-1][1], conn)
+            while(True):
+                author=input("If you want to show more information about one Author press the number next to him to go to his profile \nElse press -1 to get back\n")
+                if author.isdigit():
+                    if int(author)<=len(result) and int(author)>0: 
+                        #go to author's profile  
+                        AuthorProfile(result[author-1][0],result[author-1][1], conn)
+                    else:
+                        print("Wrong input, try again.\n")
+                elif author=="-1": return
+                else:print("Wrong input, try again.\n")
         else: print("No match")
     elif len(name)==2:
         # Creating cursor object using connection object
