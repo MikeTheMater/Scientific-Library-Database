@@ -22,7 +22,7 @@ def searchforAuthorAndTitles(name, conn):
         if choice.isdigit():
             if int(choice)<=len(result) and int(choice)>0: 
                 if result[choice-1][1]=="Article":
-                    articleInfo(result[int(choice)-1][0], conn, name)
+                    articleInfo(result[int(choice)-1][0], conn, name, flag)
                 elif result[choice-1][1]=="Scientific Book":
                     bookInfo(result[int(choice)-1][0], conn, name)
                 return
@@ -374,7 +374,7 @@ def searchforAuthor(name, conn, flag):
     
 
 #search for titles that have the words that the user gives
-def searchforTitle(title, conn):
+def searchforTitle(title, conn, flag):
     cursor = conn.cursor()
     cursor.execute('''SELECT p.Title, "Article"
                     FROM Publication as p JOIN Article as a on p.ID= a.ID
@@ -397,7 +397,7 @@ def searchforTitle(title, conn):
                 name=findTitlesAuthor(conn, result[int(choice)-1][0])
                 if result[int(choice)-1][1]=="Article":
                     #call article info to show more informations about the article
-                    articleInfo(result[int(choice)-1][0], conn, name)
+                    articleInfo(result[int(choice)-1][0], conn, name, flag)
                     break
                 elif result[int(choice)-1][1]=="Scientific Book":
                     #call bookInfo to show more informations about the book
