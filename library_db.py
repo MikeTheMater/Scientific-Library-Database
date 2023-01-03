@@ -34,7 +34,7 @@ def searchforAuthorAndTitles(name, conn):
     
 
 #search for information on the publication with the given title
-def articleInfo(title, conn, name):
+def articleInfo(title, conn, name, flag):
     cursor = conn.cursor()
     # executing our sql query
     cursor.execute("""SELECT Distinct p.Title , ar.DOI , ar.[Print ISSN], ar.[Electronic ISSN], ar.[Online ISSN], ar.Conference, ar.[Science Magazine]
@@ -54,10 +54,13 @@ def articleInfo(title, conn, name):
                 while(True):
                     back=input("Do you want to return to Article's information?(Yes/No)\n")
                     if(back=="No"):
-                        searchforAuthorAndTitles(name, conn)
+                        if flag==True:
+                            searchforAuthorAndTitles(name, conn)
+                        elif flag==False:
+                            makechoice(conn) 
                         break
                     elif (back=="Yes"):
-                        articleInfo(title, conn, name)
+                        articleInfo(title, conn, name, flag)
                         break
                     else:
                         print("Wrong in typing.\n")
@@ -67,10 +70,13 @@ def articleInfo(title, conn, name):
                 while(True):
                     back=input("Do you want to return to Article's information?(Yes/No)\n")
                     if(back=="No"):
-                        searchforAuthorAndTitles(name, conn)
+                        if flag==True:
+                            searchforAuthorAndTitles(name, conn)
+                        elif flag==False:
+                            makechoice(conn) 
                         break
                     elif (back=="Yes"):
-                        articleInfo(title, conn, name)
+                        articleInfo(title, conn, name, flag)
                         break
                     else:
                         print("Wrong in typing.\n")
@@ -80,10 +86,13 @@ def articleInfo(title, conn, name):
                 while(True):
                     back=input("Do you want to return to Article's information?(Yes/No)\n")
                     if(back=="No"):
-                        searchforAuthorAndTitles(name, conn)
+                        if flag==True:
+                            searchforAuthorAndTitles(name, conn)
+                        elif flag==False:
+                            makechoice(conn) 
                         break
                     elif (back=="Yes"):
-                        articleInfo(title, conn, name)
+                        articleInfo(title, conn, name, flag)
                         break
                     else:
                         print("Wrong in typing.\n")
@@ -93,10 +102,13 @@ def articleInfo(title, conn, name):
                 while(True):
                     back=input("Do you want to return to Article's information?(Yes/No)\n")
                     if(back=="No"):
-                        searchforAuthorAndTitles(name, conn)
+                        if flag==True:
+                            searchforAuthorAndTitles(name, conn)
+                        elif flag==False:
+                            makechoice(conn) 
                         break
                     elif (back=="Yes"):
-                        articleInfo(title, conn, name)
+                        articleInfo(title, conn, name, flag)
                         break
                     else:
                         print("Wrong in typing.\n")
@@ -317,7 +329,7 @@ def AuthorProfile(fname,lname, conn):
                 print("Wrong input, type again.\n")
 
 #search for Author's First and Last name based on the Name that user typed
-def searchforAuthor(name, conn):
+def searchforAuthor(name, conn, flag):
     name=name.split(" ")
     if len(name)==1:
         # Creating cursor object using connection object
@@ -408,7 +420,7 @@ def findTitlesAuthor(conn, title):
     return name
 
 #search for titles that are about the given keyword
-def searchforKeyword(keyword, conn):
+def searchforKeyword(keyword, conn, flag):
     cursor = conn.cursor()
     cursor.execute("""SELECT DISTINCT a_k1.Keywords, p1.Title, 'Article'
                     FROM Publication as p1 JOIN Article_Keywords as a_k1 on p1.ID= a_k1.ID,
@@ -492,21 +504,24 @@ def makechoice(conn):
         choice=input("Press 1 for Author \nPress 2 for Title \nPress 3 for general search of keyword \nPress -1 to exit\n")
         match choice:
             case "1":
+                flag=True
                 while(True):
                     name=input("Type the author you are looking for. Or type <<back>> to go back\n")
                     if name.lower()=="back": break
-                    searchforAuthor(name, conn)
+                    searchforAuthor(name, conn, flag)
 
             case "2":
+                flag=False
                 while(True):
                     title=input("Type the Title you are looking for. Or type <<back>> to go back\n")
                     if title.lower()=="back": break
-                    searchforTitle(title, conn)
+                    searchforTitle(title, conn, flag)
             case "3":
+                flag=False
                 while(True):
                     keyword=input("Type the keyword you are looking for. Or type <<back>> to go back\n")
                     if keyword.lower()=="back": break
-                    searchforKeyword(keyword, conn)
+                    searchforKeyword(keyword, conn, flag)
             case "-1":break
             case other:
                 print("Wrong input type again.")
