@@ -5,17 +5,24 @@ def searchforAuthorAndTitles(name, conn):
     # Creating cursor object using connection object
     cursor = conn.cursor()
     # executing our sql query
-    cursor.execute("""SELECT p.Title
-            FROM (Publication as p join Composes as c on p.ID=c.PublicationID) join Author as a on c.AuthorID=a.ID
-            WHERE a.FirstName= ? and a.LastName= ? """,((name[0]),(name[1])))
+    cursor.execute("""SELECT p.Title, "Article"
+            FROM (Publication as p join Composes as c on p.ID=c.PublicationID) join Author as a on c.AuthorID=a.ID, Article as ar
+            WHERE a.FirstName= ? and a.LastName= ? and ar.ID=p.ID
+            UNION
+            SELECT p.Title, "Scientific Book"
+            FROM (Publication as p join Composes as c on p.ID=c.PublicationID) join Author as a on c.AuthorID=a.ID, Scientific_Book as sb
+            WHERE a.FirstName= ? and a.LastName= ? and sb.ID=p.ID""",(name[0],name[1],name[0],name[1]))
     result=cursor.fetchall()
     print("Showing Publications of Author {} {}\n   Title".format(name[0],name[1]))
     for i in range(len(result)):
-        print("{} ".format(i+1), result[i][0])
+        print("{} ".format(i+1), result[i][0],"   ", result[i][1])
  
     choice=int(input("If you want to show more information about one Publication press the number next to its title \nElse press -1 to get back\n"))
-    if choice<len(result) and choice>0: 
-        articleInfo(result[choice-1][0], conn, name)
+    if choice<=len(result) and choice>0: 
+        if result[choice-1][1]=="Article":
+            articleInfo(result[choice-1][0], conn, name)
+        elif result[choice-1][1]=="Scientific Book":
+            bookInfo(result[choice-1][0], conn, name)
         return
     elif choice==-1: return
     
@@ -134,7 +141,7 @@ def bookInfo(title, conn, name):
                     searchforAuthorAndTitles(name, conn)
                     break
                 elif (back=="Yes"):
-                    articleInfo(title, conn, name)
+                    bookInfo(title, conn, name)
                     break
                 else:
                     print("Wrong in typing.\n")
@@ -444,7 +451,7 @@ def chapterInfo(title, conn):
 def makechoice(conn):
     while (True):
         print("What do you want to search for?")
-        choice=input("Press 1 for Author \nPress 2 for Title \nPress 3 for general search of subject/keyword \nPress -1 to exit\n")
+        choice=input("Press 1 for Author \nPress 2 for Title \nPress 3 for general search of keyword \nPress -1 to exit\n")
         match choice:
             case "1":
                 while(True):
@@ -462,15 +469,15 @@ def makechoice(conn):
                     keyword=input("Type the keyword you are looking for. Or type <<back>> to go back\n")
                     if keyword=="back": break
                     searchforKeyword(keyword, conn)
-            case "-1":quit()
+            case "-1":break
             case other:
                 print("Wrong input type again.")
 
-if __name__=="__name__":
+if __name__=="__main__":
     conn=sqlite3.connect('Scientific_Libary.db')
 
     print("Connected to SQLite")
     
-    makechoice()
+    makechoice(conn)
 
     conn.close()
