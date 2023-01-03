@@ -117,7 +117,7 @@ def bookInfo(title, conn, name):
                     searchforAuthorAndTitles(name, conn)
                     break
                 elif (back=="Yes"):
-                    bookInfo(title, conn)
+                    bookInfo(title, conn, name)
                     break
                 else:
                     print("Wrong in typing.\n")
@@ -129,7 +129,7 @@ def bookInfo(title, conn, name):
                     searchforAuthorAndTitles(name, conn)
                     break
                 elif (back=="Yes"):
-                    bookInfo(title, conn)
+                    bookInfo(title, conn, name)
                     break
                 else:
                     print("Wrong in typing.\n")
@@ -355,20 +355,32 @@ def searchforTitle(title, conn):
             print("{} ".format(i+1), result[i][0], result[i][1])
 
         while (True):
-            choice=input("If you want to select one publication press the number next to it.\n Else press -1 to go back.\n")
+            choice=input("If you want to select one publication press the number next to it.\nElse press -1 to go back.\n")
 
             if int(choice)>0 and int(choice)<=len(result):
+                name=findTitlesAuthor(conn, result[int(choice)-1][0])
                 if result[int(choice)-1][1]=="Article":
-                    articleInfo(result[int(choice)-1][0], conn, )
+                    
+                    articleInfo(result[int(choice)-1][0], conn, name)
                     break
                 elif result[int(choice)-1][1]=="Scientific Book":
-                    bookInfo(result[int(choice)-1][0], conn)
+                    bookInfo(result[int(choice)-1][0], conn, name)
                     break
             elif choice=="-1":
                 return
             else:
                 print("Wrong input, type again.")
     else:print("No match.")
+
+def findTitlesAuthor(conn, title):
+    cursor = conn.cursor()
+    cursor.execute('''SELECT a.FirstName, a.LastName
+                    FROM (Author as a join Composes as c on a.ID=c.AuthorID) join Publication as p on c.PublicationID=p.ID
+                    WHERE p.Title=?''', (title,))
+    result=cursor.fetchall()
+
+    name=[result[0][0],result[0][1]]
+    return name
 
 #search for titles that are about the given keyword
 def searchforKeyword(keyword, conn):
@@ -395,7 +407,8 @@ def searchforKeyword(keyword, conn):
 
             if int(choice)>0 and int(choice)<=len(result):
                 if result[int(choice)-1][2]=="Article":
-                    articleInfo(result[int(choice)-1][1], conn, "")
+                    name=findTitlesAuthor(conn,result[int(choice)-1][1])
+                    articleInfo(result[int(choice)-1][1], conn, name)
                     break
                 elif result[int(choice)-1][2]=="Chapter":
                     chapterInfo(result[int(choice)-1][1], conn)
