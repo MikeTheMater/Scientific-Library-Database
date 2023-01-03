@@ -9,7 +9,7 @@ def book(conn):
             VALUES(?,?,?)'''
     cur=conn.cursor()
     cur.execute(publ_sql,(bookTitle,bookAbstract,publicationYear))
-    conn.commit()
+    
 
     publicationID=findPublicationID(bookTitle, conn)
     
@@ -21,7 +21,7 @@ def book(conn):
         pub_sql='''INSERT INTO Publisher(Name)
             VALUES(?)'''
         cur.execute(pub_sql,(publisherName,))
-        conn.commit()
+        
 
         publisherID=findPublisherID(publisherName, conn)
 
@@ -39,7 +39,7 @@ def book(conn):
     sb_sql='''INSERT INTO Scientific_Book(ID, PublisherID, [Book Type], [Persistent Link], [Electronic pdf ISBN], [Electronic epub ISBN], [Online ISBN], [Print ISBN])
             VALUES(?,?,?,?,?,?,?,?)'''
     cur.execute(sb_sql,(int(publicationID[0][0]), int(publisherID[0][0]), bookType, persistentLink, electronic_pdf_ISBN, electronic_epub_ISBN, online_ISBN, print_ISBN))
-    conn.commit()
+    
 
     chapter_number=int(input("How many chapters does the book have?\n"))
 
@@ -65,7 +65,7 @@ def book(conn):
                 VALUES(?,?,?,?)'''
         
         cur.execute(abstr_sql,(int(publicationID[0][0]),chapterTitle,chapter_abstract,chapterDOI))
-        conn.commit()
+        
 
         keyword_option=input("Do you want to add keywords?(Yes/No)\n")
         while(True):
@@ -77,7 +77,7 @@ def book(conn):
                                 VALUES(?,?)'''
                     chapterID=findChapterID(chapterTitle, conn)
                     cur.execute(key_sql,(int(chapterID[0][0]),k))
-                    conn.commit()
+                    
                 keyword_option=input("Do you want to add another keyword?(Yes/No)\n")
             elif(keyword_option=="No"):
                 break
@@ -98,7 +98,7 @@ def book(conn):
                     VALUES(?,?,?,?)'''
 
             cur.execute(author_sql,(bookAuthor[0], bookAuthor[1], email, city))
-            conn.commit()
+            
         else: affiliation=input("Type author's affiliation.\n")
 
         AuthorID=findAuthorID(bookAuthor, conn)
@@ -107,7 +107,7 @@ def book(conn):
                 VALUES(?,?,?)'''
 
         cur.execute(author_sql,(int(AuthorID[0][0]), int(publicationID[0][0]), affiliation))
-        conn.commit()
+
         #checking if the book has more than one authors
         co_authors=input("Does the book have other co-author?(Yes/No)\n")
         while (True):
@@ -118,7 +118,7 @@ def book(conn):
             else:
                 co_authors=input("Wront input, type again.\n")
         if(co_authors=="No"):break
-
+    conn.commit()
     print("Book import finished successfully.\n")
 
 def article(conn):
@@ -130,7 +130,6 @@ def article(conn):
             VALUES(?,?,?)'''
     cur=conn.cursor()
     cur.execute(publ_sql,(ArticleTitle,ArticleAbstract,publicationYear))
-    conn.commit()
 
     publicationID=findPublicationID(ArticleTitle, conn)
     
@@ -142,12 +141,10 @@ def article(conn):
         pub_sql='''INSERT INTO Publisher(Name)
             VALUES(?)'''
         cur.execute(pub_sql,(publisherName,))
-        conn.commit()
 
         publisherID=findPublisherID(publisherName, conn)
         
-    ArticleDOI=input("Type the Article's DOI if it has one.(Else press enter)\n")
-    if ArticleDOI=="":ArticleDOI=None
+    ArticleDOI=input("Type the Article's DOI.\n")
     print_ISSN=input("Type the Article's print ISSN if it has one.(Else press enter)\n")
     if print_ISSN=="":print_ISSN=None
     electronic_ISSN=input("Type the Article's electronic ISSN if it has one.(Else press enter)\n")
@@ -162,24 +159,6 @@ def article(conn):
     sb_sql='''INSERT INTO Article(ID, PublisherID, DOI, [Print ISSN], [Electronic ISSN], [Online ISSN], Conference, [Science Magazine])
             VALUES(?,?,?,?,?,?,?,?)'''
     cur.execute(sb_sql,(int(publicationID[0][0]), int(publisherID[0][0]), ArticleDOI, print_ISSN, electronic_ISSN, online_ISSN, articleConference, scienceMagazine))
-    conn.commit()
-
-    citation_option=input("Do you want to add citations?(Yes/No)\n")
-    while(True):
-        count=1
-        if(citation_option=="Yes"):
-            citation=input("Type the citation No{} of the article.\n".format(count))
-            citation_year=input("Type the year of the citation.\n")
-            key_sql='''INSERT INTO Article_Citations(ID, Citations, Year)
-                        VALUES(?,?,?)'''
-            cur.execute(key_sql,(int(publicationID[0][0]), citation, citation_year))
-            conn.commit()
-            citation_option=input("Do you want to add another citation?(Yes/No)\n")
-        elif(citation_option=="No"):
-            break
-        else:
-            print("Wrong input, type again.\n")
-            citation_option=input()
 
     reference_option=input("Do you want to add references?(Yes/No)\n")
     while(True):
@@ -187,10 +166,10 @@ def article(conn):
         if(reference_option=="Yes"):
             reference=input("Type the reference No{} of the article.\n".format(count))
             reference_year=input("Type the year of the reference.\n")
-            key_sql='''INSERT INTO Article_References(ID, References, Year)
+            key_sql='''INSERT INTO Article_References(ID, [References], Year)
                         VALUES(?,?,?)'''
             cur.execute(key_sql,(int(publicationID[0][0]), reference, reference_year))
-            conn.commit()
+
             reference_option=input("Do you want to add another reference?(Yes/No)\n")
         elif(reference_option=="No"):
             break
@@ -208,7 +187,7 @@ def article(conn):
                             VALUES(?,?)'''
                 publicationID=findPublicationID(ArticleTitle, conn)
                 cur.execute(key_sql,(int(publicationID[0][0]),k))
-                conn.commit()
+
             keyword_option=input("Do you want to add another keyword?(Yes/No)\n")
         elif(keyword_option=="No"):
             break
@@ -229,7 +208,7 @@ def article(conn):
                     VALUES(?,?,?,?)'''
 
             cur.execute(author_sql,(articleAuthor[0], articleAuthor[1], email, city))
-            conn.commit()
+
         else: affiliation=input("Type author's affiliation.\n")
 
         AuthorID=findAuthorID(articleAuthor, conn)
@@ -238,9 +217,9 @@ def article(conn):
                 VALUES(?,?,?)'''
 
         cur.execute(author_sql,(int(AuthorID[0][0]), int(publicationID[0][0]), affiliation))
-        conn.commit()
+        
         #checking if the book has more than one authors
-        co_authors=input("Does the book have other co-author?(Yes/No)\n")
+        co_authors=input("Does the article have other co-author?(Yes/No)\n")
         while (True):
             if(co_authors=="No"):
                 break
@@ -249,7 +228,7 @@ def article(conn):
             else:
                 co_authors=input("Wront input, type again.\n")
         if(co_authors=="No"):break
-
+    conn.commit()
     print("Article import finished successfully.\n")
 
 def findAuthorID(author, conn):
@@ -300,7 +279,7 @@ def uploadchoice(conn):
             case "2":
                 article(conn)
             case "-1":
-                quit(conn)
+                return
             case other:
                 print("Wrong input type again.")
         choice=input("Do you want to add something else?.(Yes/No)\n")
