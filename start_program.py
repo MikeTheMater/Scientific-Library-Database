@@ -4,9 +4,9 @@ import log_in
 import sqlite3
 
 if __name__=="__main__":
-    conn=sqlite3.connect('Scientific_Libary.db')
 
     while(True):
+        conn=sqlite3.connect('Scientific_Libary.db')
         option=input("If you want to sign in press 'Sign in'\nIf you don't have an account and want to sign up press 'Sign up'\nElse press quit to exit program\n")
         if (option=="Sign up"):
             log_in.sign_up(conn)
@@ -16,7 +16,7 @@ if __name__=="__main__":
 
                 if logStatus:
                     print("Login successfull.")
-                    fun=input("Do you want to read articles and books or upload files?(Read/Upload)\n")
+                    fun=input("Do you want to read articles and books or upload files?(Read/Upload/ Back to go back)\n")
 
                     print("Connected to SQLite")
                     while(True):
@@ -25,6 +25,8 @@ if __name__=="__main__":
                             break
                         elif fun=="Upload" or fun=="upload":
                             upload_file.uploadchoice(conn)
+                            break
+                        elif fun=="Back" or fun=="back":
                             break
                         else:
                             input("Wrong input, try again.\n")
