@@ -50,7 +50,7 @@ def articleInfo(title, conn, name, flag):
         temp=[]
         for j in range(7):
             if result[i][j]==None:
-                temp.append("NULL")
+                temp.append("-")
             else:
                 temp.append(result[i][j])
         print(("Title: {} \nDOI: {}\nPrint ISSN: {}" + "\t" + "Electronic ISSN: {}"  + "\t" + "Online ISSN:{}\n" + "Conference:{}\nScience Magazine:{}").format(temp[0], temp[1], temp[2], temp[3], temp[4], temp[5], temp[6]).expandtabs())
@@ -143,7 +143,15 @@ def bookInfo(title, conn, name, flag):
     print("    Title   Persistent Link    Electronic pdf ISBN     Electronic epub ISBN     Online ISBN     Print ISBN")
     for i in range(len(result)):
         print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1],"  ", result[i][2],"  " ,result[i][3],"  ", result[i][4],"  ", result[i][5], " ", result[i][6] )
-    
+    for i in range(len(result)):
+        temp=[]
+        for j in range(7):
+            if result[i][j]==None:
+                temp.append("-")
+            else:
+                temp.append(result[i][j])
+        print(("Title: {} \nBook Type:{}" + "\t" + "Persistent Link: {}\nElectronic pdf ISBN: {}" + "\t" + "Electronic epub ISBN: {}\nOnline ISBN:{}" + "\t" + "Print ISBN:{}").format(temp[0], temp[1], temp[2], temp[3], temp[4], temp[5], temp[6]).expandtabs(30))
+        
     while(True):
         choice=input("Press 1 to show the Authors \nPress 2 to show Abstract \nPress 3 to show Chapters \nPress -1 to exit\n")
         
