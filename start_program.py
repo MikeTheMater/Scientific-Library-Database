@@ -7,7 +7,7 @@ if __name__=="__main__":
 
     while(True):
         conn=sqlite3.connect('Scientific_Libary.db')
-        option=input("If you want to sign in press 'Sign in'\nIf you don't have an account and want to sign up press 'Sign up'\nElse press quit to exit program\n")
+        option=input("If you want to sign in type 'Sign in'\nIf you don't have an account and want to sign up type 'Sign up'\nElse type quit to exit program\n")
         if (option=="Sign up"):
             log_in.sign_up(conn)
         elif (option=="Sign in"):
@@ -16,17 +16,18 @@ if __name__=="__main__":
 
                 if logStatus:
                     print("Login successfull.")
-                    fun=input("Do you want to read articles and books or upload files?(Read/Upload/ Back to go back)\n")
+                    
 
                     print("Connected to SQLite")
                     while(True):
-                        if fun=="Read" or fun=="read":
+                        fun=input("Do you want to read articles and books or upload files?(Read/Upload/ Back to go back)\n")
+                        if fun.lower()=="read":
                             library_db.makechoice(conn)
                             break
-                        elif fun=="Upload" or fun=="upload":
+                        elif fun.lower()=="upload":
                             upload_file.uploadchoice(conn)
                             break
-                        elif fun=="Back" or fun=="back":
+                        elif fun.lower()=="back":
                             break
                         else:
                             input("Wrong input, try again.\n")
