@@ -70,7 +70,7 @@ def articleInfo(title, conn, name, flag):
                         elif flag==False:
                             return 
                         break
-                    elif (back=="nes"):
+                    elif (back.lower()=="yes"):
                         articleInfo(title, conn, name, flag)
                         break
                     else:
