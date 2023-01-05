@@ -45,9 +45,16 @@ def articleInfo(title, conn, name, flag):
             FROM ((Article as ar join Publication as p on p.ID=ar.ID) join Composes as c on c.PublicationID=p.ID) join Author as a on a.ID=c.AuthorID
             WHERE p.Title=?""", (title,))
     result=cursor.fetchall()
-    print("    Title   DOI    Print ISSN    Electronic ISSN     Online ISSN     Conference     Science Magazine")
+    print("   {:>30}  {:>60}  {:>30}  {:>30}  {:>15}  {:>15}  {:>70}" .format('Title', "DOI", "Print ISSN", "Electronic ISSN", "Online ISSN", "Conference", "Science Magazine"))
     for i in range(len(result)):
-        print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1],"  ", result[i][2],"  " ,result[i][3],"  ", result[i][4],"  ", result[i][5], " ", result[i][6] )
+        temp=[]
+        for j in range(7):
+            if result[i][j]==None:
+                temp.append("NULL")
+            else:
+                temp.append(result[i][j])
+
+        print("{}  {:>10}  {:>10}  {:>15}  {:>20}  {:>15}  {:>20}  {:>20}".format(i+1, temp[0], temp[1], temp[2], temp[3], temp[4], temp[5], temp[6]))
     
     while(True):
         choice=input("Press 1 to show the Authors \nPress 2 to show References \nPress 3 to show Citations \nPress 4 to show Abstract \nPress -1 to exit\n")
@@ -118,7 +125,10 @@ def articleInfo(title, conn, name, flag):
                         print("Wrong in typing.\n")
                 break
             case "-1":
-                searchforAuthorAndTitles(name, conn, flag)
+                if flag==True:
+                    searchforAuthorAndTitles(name, conn, flag)
+                elif flag==False:
+                    return
                 break
             case other:
                 print("No match, try again.\n")
@@ -405,17 +415,17 @@ def searchforTitle(title, conn, flag):
 
         while (True):
             choice=input("If you want to select one publication press the number next to it.\nElse press -1 to go back.\n")
-
-            if int(choice)>0 and int(choice)<=len(result):
-                name=findTitlesAuthor(conn, result[int(choice)-1][0])
-                if result[int(choice)-1][1]=="Article":
-                    #call article info to show more informations about the article
-                    articleInfo(result[int(choice)-1][0], conn, name, flag)
-                    break
-                elif result[int(choice)-1][1]=="Scientific Book":
-                    #call bookInfo to show more informations about the book
-                    bookInfo(result[int(choice)-1][0], conn, name,flag)
-                    return
+            if choice.isnumeric():
+                if int(choice)>0 and int(choice)<=len(result):
+                    name=findTitlesAuthor(conn, result[int(choice)-1][0])
+                    if result[int(choice)-1][1]=="Article":
+                        #call article info to show more informations about the article
+                        articleInfo(result[int(choice)-1][0], conn, name, flag)
+                        break
+                    elif result[int(choice)-1][1]=="Scientific Book":
+                        #call bookInfo to show more informations about the book
+                        bookInfo(result[int(choice)-1][0], conn, name,flag)
+                        return
             elif choice=="-1":
                 return
             else:
