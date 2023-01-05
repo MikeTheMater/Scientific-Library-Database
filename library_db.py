@@ -45,7 +45,7 @@ def articleInfo(title, conn, name, flag):
             FROM ((Article as ar join Publication as p on p.ID=ar.ID) join Composes as c on c.PublicationID=p.ID) join Author as a on a.ID=c.AuthorID
             WHERE p.Title=?""", (title,))
     result=cursor.fetchall()
-    print("   {:>30}  {:>60}  {:>30}  {:>30}  {:>15}  {:>15}  {:>70}" .format('Title', "DOI", "Print ISSN", "Electronic ISSN", "Online ISSN", "Conference", "Science Magazine"))
+    
     for i in range(len(result)):
         temp=[]
         for j in range(7):
@@ -53,8 +53,8 @@ def articleInfo(title, conn, name, flag):
                 temp.append("NULL")
             else:
                 temp.append(result[i][j])
-
-        print("{}  {:>10}  {:>10}  {:>15}  {:>20}  {:>15}  {:>20}  {:>20}".format(i+1, temp[0], temp[1], temp[2], temp[3], temp[4], temp[5], temp[6]))
+        print(("Title: {} \nDOI: {}\nPrint ISSN: {}" + "\t" + "Electronic ISSN: {}"  + "\t" + "Online ISSN:{}\n" + "Conference:{}\nScience Magazine:{}").format(temp[0], temp[1], temp[2], temp[3], temp[4], temp[5], temp[6]).expandtabs())
+        
     
     while(True):
         choice=input("Press 1 to show the Authors \nPress 2 to show References \nPress 3 to show Citations \nPress 4 to show Abstract \nPress -1 to exit\n")
