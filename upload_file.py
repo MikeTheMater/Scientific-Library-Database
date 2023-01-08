@@ -285,7 +285,7 @@ def uploadchoice(conn):
         choice=input("Do you want to add something else?.(Yes/No)\n")
         if choice=="No":break
 
-if __name__=="__name__":
+if __name__=="__main__":
     conn=sqlite3.connect('Scientific_Libary.db')
 
     print("Connected to SQLite")

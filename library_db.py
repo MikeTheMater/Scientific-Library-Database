@@ -86,7 +86,7 @@ def articleInfo(title, conn, name, flag):
                         elif flag==False:
                             return
                         break
-                    elif (back=="nes"):
+                    elif (back.lower()=="yes"):
                         articleInfo(title, conn, name, flag)
                         break
                     else:
@@ -140,9 +140,7 @@ def bookInfo(title, conn, name, flag):
             FROM ((Scientific_Book as sb join Publication as p on p.ID=sb.ID) join Composes as c on c.PublicationID=p.ID) join Author as a on a.ID=c.AuthorID
             WHERE p.Title=?""", (title,))
     result=cursor.fetchall()
-    print("    Title   Persistent Link    Electronic pdf ISBN     Electronic epub ISBN     Online ISBN     Print ISBN")
-    for i in range(len(result)):
-        print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1],"  ", result[i][2],"  " ,result[i][3],"  ", result[i][4],"  ", result[i][5], " ", result[i][6] )
+    
     for i in range(len(result)):
         temp=[]
         for j in range(7):
@@ -303,12 +301,14 @@ def AuthorProfile(fname,lname, conn, flag):
     
     cursor.execute("""SELECT a_c.Year, count(*) as "Citations per Year"
                         FROM Article_Citations as a_c JOIN (SELECT p.Title
-                                                            FROM (Author as a JOIN Composes as c on a.ID= c.AuthorID) JOIN Publication as p on c.PublicationID= p.ID
+                                                            FROM (Author as a JOIN Composes as c on a.ID= c.AuthorID) 
+                                                                JOIN Publication as p on c.PublicationID= p.ID
                                                             WHERE a.FirstName= ? AND a.LastName= ?) as t
                         WHERE instr(a_c.Citations, t.Title)>0
-                        GROUP by a_c.Year""", (fname,lname,))
+                        GROUP by a_c.Year
+                        """, (fname,lname,))
     result=cursor.fetchall()
-    if len(result)<0:
+    if len(result)>0:
         print(" Number of citaitons for {} {} each year.".format(fname,lname))
         for i in range(len(result)):
             print("{} ".format(i+1),"  " ,result[i][0],"  " ,result[i][1])
@@ -321,7 +321,8 @@ def AuthorProfile(fname,lname, conn, flag):
                                              AND a.FirstName!= ? AND a.LastName!= ?
                     GROUP by a.LastName, a.FirstName
                     ORDER by "Number of Collaborations" DESC, a.LastName
-                    LIMIT 2""", (fname,lname,fname,lname,))
+                    LIMIT 2
+                    """, (fname,lname,fname,lname,))
     result=cursor.fetchall()
     if(len(result)>0):
         print(" Top co-authors of {} {} and the number of their common publications.".format(fname,lname))
@@ -407,14 +408,16 @@ def searchforAuthor(name, conn, flag):
 #search for titles that have the words that the user gives
 def searchforTitle(title, conn, flag):
     cursor = conn.cursor()
-    cursor.execute('''SELECT p.Title, "Article"
+    cursor.execute('''
+                    SELECT p.Title, "Article"
                     FROM Publication as p JOIN Article as a on p.ID= a.ID
                     WHERE p.Title like :title
                     UNION
                     SELECT p.Title, "Scientific Book"
                     FROM Publication as p JOIN Scientific_Book as sb on p.ID= sb.ID
                     WHERE p.Title like :title
-                    ORDER by p.Title ''', (f'%{title}%',))
+                    ORDER by p.Title 
+                    ''', (f'%{title}%',))
     result=cursor.fetchall()
     if(len(result)>0):
         print("Titles")

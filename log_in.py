@@ -24,7 +24,7 @@ def sign_up(conn):
                 FROM  User as u
                 WHERE u.UserID=?""",(username,))
         result=cursor.fetchall()
-        print(result)
+
         if len(result)>0:
             print("Username already exists try another one. Or type 'back' to go back")
         else:
